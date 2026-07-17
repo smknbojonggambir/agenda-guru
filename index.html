@@ -3,203 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMK Dashboard Cloud - Final</title>
+    <title>SMK Dashboard Pro - NextGen</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f0fdf4; }
-        .panel { display: none; }
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --bg: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #1e293b; }
+        .panel { display: none; animation: fadeIn 0.3s ease-out; }
         .panel.active { display: block; }
-        canvas { touch-action: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-item.active { background: #e0e7ff; color: var(--primary); border-right: 4px solid var(--primary); }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        canvas { touch-action: none; cursor: crosshair; }
+        @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
+        .print-only { display: none; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen overflow-hidden">
 
-    <div id="loading" class="fixed inset-0 bg-emerald-900/90 z-[99] flex flex-col items-center justify-center text-white">
-        <div class="w-12 h-12 border-4 border-t-transparent border-white rounded-full animate-spin mb-4"></div>
-        <p class="font-bold tracking-widest uppercase">Sinkronisasi Data...</p>
+    <!-- OVERLAY LOADING -->
+    <div id="loading" class="fixed inset-0 bg-slate-900/90 z-[99] flex flex-col items-center justify-center text-white">
+        <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="font-bold tracking-widest text-indigo-400">MEMUAT SISTEM...</p>
     </div>
 
     <!-- LOGIN SCREEN -->
-    <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-emerald-100">
+    <div id="screen-login" class="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+        <div class="bg-white/95 backdrop-blur p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/20">
             <div class="text-center mb-8">
-                <img class="w-20 h-20 mx-auto mb-4" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
-                <h1 class="text-2xl font-bold text-emerald-900 leading-tight">Dashboard Guru Online</h1>
-                <p class="text-gray-400 text-sm mt-2">Gunakan akun Anda untuk masuk</p>
+                <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <img class="w-16 h-16 object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">SMK Cloud</h1>
+                <p class="text-slate-500 font-medium mt-1">Dashboard Terintegrasi Guru</p>
             </div>
             <div class="space-y-4">
-                <select id="l-user" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50"></select>
-                <input type="password" id="l-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50">
-                <button onclick="doLogin()" id="btn-login" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 transition active:scale-95 shadow-lg">MASUK</button>
+                <div class="relative">
+                    <select id="l-user" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none appearance-none focus:ring-2 focus:ring-indigo-500 transition"></select>
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><i data-lucide="chevron-down"></i></div>
+                </div>
+                <input type="password" id="l-pass" placeholder="Password Sistem" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                <button onclick="doLogin()" id="btn-login" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition active:scale-[0.98] shadow-xl shadow-indigo-200 uppercase tracking-wider">MASUK SEKARANG</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD -->
-    <div id="screen-main" class="hidden min-h-screen flex flex-col">
-        <header class="bg-emerald-900 text-white p-4 shadow-lg flex justify-between items-center sticky top-0 z-40">
-            <div class="flex items-center gap-3">
-                <img class="w-8 h-8 bg-white p-1 rounded" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
+    <!-- MAIN APP -->
+    <div id="screen-main" class="hidden h-screen flex flex-col no-print">
+        <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center glass sticky top-0 z-40">
+            <div class="flex items-center gap-4">
+                <img class="w-10 h-10 object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
                 <div>
-                    <h2 id="u-name" class="font-bold text-sm uppercase">Nama Guru</h2>
-                    <span id="u-level" class="text-[10px] bg-emerald-700 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">Level</span>
+                    <h2 id="u-name" class="font-bold text-slate-900 leading-none text-lg">Nama Guru</h2>
+                    <span id="u-level" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest mt-1 inline-block">LEVEL</span>
                 </div>
             </div>
-            <button onclick="location.reload()" class="bg-emerald-800 p-2 rounded-full hover:bg-red-600 transition"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+            <div class="flex items-center gap-2">
+                <button onclick="window.location.reload()" class="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition"><i data-lucide="power" class="w-5 h-5"></i></button>
+            </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
-            <nav class="w-16 md:w-64 bg-white border-r flex flex-col p-2 md:p-4 gap-2">
-                <button onclick="setPanel('agenda')" class="nav-btn active flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-emerald-50"><i data-lucide="calendar"></i><span class="hidden md:block">Agenda</span></button>
-                <button id="nav-abs" onclick="setPanel('absensi')" class="nav-btn flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-emerald-50"><i data-lucide="users"></i><span class="hidden md:block">Absensi</span></button>
-                <button onclick="setPanel('rekap')" class="nav-btn flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-emerald-50"><i data-lucide="pie-chart"></i><span class="hidden md:block">Monitoring</span></button>
+            <!-- SIDEBAR -->
+            <nav class="w-20 md:w-72 bg-white border-r border-slate-100 flex flex-col p-3 gap-2 overflow-y-auto">
+                <button onclick="setPanel('agenda')" class="sidebar-item nav-btn active flex items-center gap-4 p-4 rounded-2xl text-slate-500 font-semibold transition">
+                    <i data-lucide="layout-dashboard"></i><span class="hidden md:block">Agenda Mengajar</span>
+                </button>
+                <button id="nav-abs" onclick="setPanel('absensi')" class="sidebar-item nav-btn flex items-center gap-4 p-4 rounded-2xl text-slate-500 font-semibold transition">
+                    <i data-lucide="user-check"></i><span class="hidden md:block">Presensi Siswa</span>
+                </button>
+                <button id="nav-nilai" onclick="setPanel('nilai')" class="sidebar-item nav-btn flex items-center gap-4 p-4 rounded-2xl text-slate-500 font-semibold transition">
+                    <i data-lucide="award"></i><span class="hidden md:block">Input Nilai</span>
+                </button>
+                <button onclick="setPanel('rekap')" class="sidebar-item nav-btn flex items-center gap-4 p-4 rounded-2xl text-slate-500 font-semibold transition">
+                    <i data-lucide="bar-chart-big"></i><span class="hidden md:block">Monitoring & Laporan</span>
+                </button>
             </nav>
 
-            <main class="flex-1 overflow-y-auto p-4 md:p-8">
+            <!-- MAIN CONTENT -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-10 scroll-smooth">
                 
                 <!-- PANEL: AGENDA -->
-                <div id="p-agenda" class="panel active space-y-6">
-                    <div id="form-agenda-box" class="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-                        <h3 class="text-lg font-bold mb-4 text-emerald-800 flex items-center gap-2"><i data-lucide="edit"></i> Input Agenda Pembelajaran</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 ml-1">TANGGAL</label><input type="date" id="f-tgl" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"></div>
-                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 ml-1">JAM KE</label><input type="text" id="f-jam" placeholder="Misal: 1-4" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"></div>
-                            <select id="f-kelas" class="p-3 bg-gray-50 border rounded-xl outline-none"></select>
-                            <select id="f-mapel" class="p-3 bg-gray-50 border rounded-xl outline-none"></select>
-                            <input type="text" id="f-materi" placeholder="Materi Pokok" class="p-3 bg-gray-50 border rounded-xl outline-none md:col-span-2">
-                            <textarea id="f-tujuan" placeholder="Tujuan Pembelajaran" class="p-3 bg-gray-50 border rounded-xl outline-none md:col-span-2 h-20"></textarea>
+                <div id="p-agenda" class="panel active space-y-8">
+                    <div id="form-agenda-box" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-slate-800">Jurnal Harian</h3>
+                            <div class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-tighter" id="current-date">JULY 17, 2026</div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 ml-1">TANGGAL</label><input type="date" id="f-tgl" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition"></div>
+                            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 ml-1">JAM KE</label><input type="text" id="f-jam" placeholder="Contoh: 1 - 4" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition"></div>
+                            <select id="f-kelas" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition"></select>
+                            <select id="f-mapel" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition"></select>
+                            <input type="text" id="f-materi" placeholder="Materi / Topik Pembelajaran" class="md:col-span-2 p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                            <textarea id="f-tujuan" placeholder="Tujuan Pembelajaran" class="md:col-span-2 p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition h-24"></textarea>
+                            <select id="f-metode" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                <option value="">-- Pilih Model --</option><option>PjBL</option><option>PBL</option><option>DL</option><option>PE</option><option>PP</option>
+                            </select>
+                            <select id="f-asesmen" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                <option value="">-- Pilih Asesmen --</option><option>Formatif</option><option>Sumatif</option>
+                            </select>
                             
-                            <select id="f-metode" class="p-3 bg-gray-50 border rounded-xl outline-none">
-                                <option value="">-- Pilih Model Pembelajaran --</option>
-                                <option value="PjBL">PjBL (Project Based Learning)</option>
-                                <option value="PBL">PBL (Problem Based Learning)</option>
-                                <option value="DL">DL (Discovery Learning)</option>
-                                <option value="PE">PE (Peer Education)</option>
-                                <option value="PP">PP (Production Based Training)</option>
-                            </select>
+                            <div class="md:col-span-2 space-y-4">
+                                <div class="p-6 border-2 border-dashed border-slate-200 rounded-3xl text-center space-y-4">
+                                    <div id="cam-box" class="hidden relative rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl">
+                                        <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+                                        <button onclick="takePhoto()" class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white p-5 rounded-full shadow-2xl text-indigo-600 active:scale-90 transition"><i data-lucide="camera" class="w-8 h-8"></i></button>
+                                    </div>
+                                    <div id="pre-box" class="hidden">
+                                        <img id="photo-pre" class="w-full rounded-2xl shadow-lg aspect-video object-cover">
+                                        <button onclick="resetCam()" class="text-xs font-bold text-red-500 mt-2 hover:underline">AMBIL ULANG FOTO</button>
+                                    </div>
+                                    <button id="btn-cam" onclick="initCam()" class="flex flex-col items-center justify-center gap-2 mx-auto text-indigo-600 font-bold"><i data-lucide="camera" class="w-10 h-10"></i><span>AMBIL BUKTI PEMBELAJARAN</span></button>
+                                </div>
+                            </div>
 
-                            <select id="f-asesmen" class="p-3 bg-gray-50 border rounded-xl outline-none">
-                                <option value="">-- Pilih Jenis Asesmen --</option>
-                                <optgroup label="Asesmen Formatif">
-                                    <option value="Formatif - Pretest">Pretest</option>
-                                    <option value="Formatif - Post Test">Post Test</option>
-                                    <option value="Formatif - Quiz">Quiz</option>
-                                    <option value="Formatif - Tanya Jawab">Tanya Jawab</option>
-                                </optgroup>
-                                <optgroup label="Asesmen Sumatif">
-                                    <option value="Sumatif - Portofolio">Portofolio</option>
-                                    <option value="Sumatif - Proyek">Proyek</option>
-                                    <option value="Sumatif - Observasi Produk">Observasi Produk</option>
-                                    <option value="Sumatif - Perform">Perform</option>
-                                    <option value="Sumatif - Praktik">Praktik</option>
-                                    <option value="Sumatif - Lisan">Lisan</option>
-                                </optgroup>
-                            </select>
-
-                            <!-- KAMERA -->
                             <div class="md:col-span-2 space-y-2">
-                                <label class="text-xs font-bold text-gray-400">DOKUMENTASI PEMBELAJARAN</label>
-                                <div id="cam-box" class="hidden relative bg-black rounded-2xl overflow-hidden aspect-video shadow-inner">
-                                    <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
-                                    <button onclick="takePhoto()" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white p-5 rounded-full shadow-2xl active:scale-90 transition"><i data-lucide="camera" class="text-emerald-700"></i></button>
+                                <label class="text-[10px] font-extrabold text-slate-400 tracking-widest uppercase ml-1">Tanda Tangan Guru</label>
+                                <div class="bg-slate-50 border border-slate-100 rounded-3xl p-1 shadow-inner">
+                                    <canvas id="canvas" class="w-full h-40"></canvas>
                                 </div>
-                                <div id="pre-box" class="hidden">
-                                    <img id="photo-pre" class="w-full rounded-2xl border-4 border-white shadow aspect-video object-cover">
-                                    <button onclick="resetCam()" class="text-xs text-red-500 font-bold mt-2 flex items-center gap-1"><i data-lucide="refresh-ccw" class="w-3 h-3"></i> ULANGI FOTO</button>
-                                </div>
-                                <button id="btn-cam" onclick="initCam()" class="w-full py-6 border-2 border-dashed border-emerald-200 rounded-2xl text-emerald-600 flex flex-col items-center justify-center gap-2 hover:bg-emerald-50 transition font-bold uppercase tracking-wider"><i data-lucide="camera" class="w-8 h-8"></i> Ambil Foto Bukti</button>
+                                <button onclick="clearCanvas()" class="text-[10px] font-bold text-slate-400 hover:text-red-500">HAPUS CORETAN</button>
                             </div>
-
-                            <!-- TANDA TANGAN -->
-                            <div class="md:col-span-2">
-                                <label class="text-xs font-bold text-gray-400">TANDA TANGAN GURU</label>
-                                <canvas id="canvas" class="w-full h-40 border bg-gray-50 rounded-2xl cursor-crosshair"></canvas>
-                                <button onclick="clearCanvas()" class="text-[10px] text-red-500 font-bold uppercase mt-1">Bersihkan Tanda Tangan</button>
-                            </div>
-
-                            <button onclick="saveAgenda()" class="md:col-span-2 bg-emerald-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-emerald-700 transition uppercase tracking-widest">SIMPAN SEMUA DATA</button>
+                            <button onclick="saveAgenda()" class="md:col-span-2 bg-indigo-600 text-white font-bold py-5 rounded-3xl shadow-2xl shadow-indigo-100 hover:bg-indigo-700 transition active:scale-[0.99] uppercase tracking-widest">KIRIM AGENDA</button>
                         </div>
                     </div>
-
-                    <!-- RIWAYAT -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 overflow-hidden">
-                        <div class="p-4 bg-emerald-50 border-b flex justify-between items-center">
-                            <h3 class="font-bold text-emerald-800 tracking-tight">Riwayat Pembelajaran</h3>
-                            <button onclick="initData()" class="p-1 hover:rotate-180 transition-all duration-500"><i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-600"></i></button>
+                    
+                    <!-- RECENT LIST -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800">Riwayat Pengajaran</h3>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-[11px] md:text-sm">
-                                <thead class="bg-gray-50 text-gray-500 uppercase text-[10px]">
-                                    <tr>
-                                        <th class="p-4 text-left">Tgl/Guru</th>
-                                        <th class="p-4 text-left">Kelas/Mapel</th>
-                                        <th class="p-4 text-left">Materi/Metode</th>
-                                        <th class="p-4 text-center">Bukti</th>
-                                        <th class="p-4 text-center">Opsi</th>
-                                    </tr>
+                            <table class="w-full text-sm">
+                                <thead class="bg-slate-50 text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">
+                                    <tr><th class="p-5 text-left">Tanggal</th><th class="p-5 text-left">Guru</th><th class="p-5 text-left">Mapel/Kelas</th><th class="p-5 text-center">Bukti</th><th class="p-5 text-center">Aksi</th></tr>
                                 </thead>
-                                <tbody id="t-agenda" class="divide-y divide-gray-100"></tbody>
+                                <tbody id="t-agenda" class="divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- PANEL ABSENSI -->
-                <div id="p-absensi" class="panel space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-                        <h3 class="text-lg font-bold mb-4 text-emerald-800 flex items-center gap-2"><i data-lucide="users"></i> Presensi Siswa</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <input type="date" id="abs-tgl" class="p-3 bg-gray-50 border rounded-xl outline-none">
-                            <select id="abs-kelas" onchange="renderSiswa()" class="p-3 bg-gray-50 border rounded-xl outline-none"></select>
+                <!-- PANEL: NILAI -->
+                <div id="p-nilai" class="panel space-y-8">
+                    <div id="form-nilai-box" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-bold text-slate-800 mb-6">Input Penilaian</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <input type="date" id="n-tgl" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500">
+                            <select id="n-kelas" onchange="loadSiswaNilai()" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none"></select>
+                            <select id="n-siswa" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none"><option value="">-- Pilih Siswa --</option></select>
+                            <select id="n-mapel" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none"></select>
+                            <input type="number" id="n-angka" placeholder="Masukkan Nilai (0-100)" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none">
+                            <input type="text" id="n-cat" placeholder="Tugas ke / UTS / UAS" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none">
+                            <button onclick="saveNilai()" class="md:col-span-2 bg-indigo-600 text-white font-bold py-5 rounded-3xl shadow-xl uppercase tracking-widest">SIMPAN NILAI</button>
                         </div>
-                        <div id="siswa-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6"></div>
-                        <button id="btn-save-abs" onclick="saveAbsensi()" class="w-full bg-emerald-600 text-white font-black py-5 rounded-2xl hidden shadow-lg shadow-emerald-100">KIRIM DATA ABSENSI</button>
+                    </div>
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="p-6 border-b border-slate-50"><h3 class="font-bold text-slate-800">Daftar Nilai Siswa</h3></div>
+                        <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-400 uppercase text-[10px] font-bold"><tr class="text-left"><th class="p-5">Siswa</th><th class="p-5">Mata Pelajaran</th><th class="p-5 text-center">Skor</th><th class="p-5">Aksi</th></tr></thead><tbody id="t-nilai" class="divide-y divide-slate-50"></tbody></table></div>
                     </div>
                 </div>
 
-                <!-- PANEL REKAP -->
-                <div id="p-rekap" class="panel space-y-6">
-                    <h3 class="text-xl font-bold text-emerald-800">Statistik Dashboard</h3>
-                    <div id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-                    <div class="bg-white p-8 rounded-2xl border text-center text-gray-400 italic">Data Monitoring Real-time</div>
+                <!-- PANEL: ABSENSI -->
+                <div id="p-absensi" class="panel">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-bold text-slate-800 mb-6 font-bold flex items-center gap-2"><i data-lucide="user-check"></i> Presensi Kelas</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <input type="date" id="abs-tgl" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                            <select id="abs-kelas" onchange="renderSiswa()" class="p-4 bg-slate-50 border border-slate-100 rounded-2xl"></select>
+                        </div>
+                        <div id="siswa-list" class="grid grid-cols-1 gap-3"></div>
+                        <button id="btn-save-abs" onclick="saveAbsensi()" class="w-full mt-10 bg-indigo-600 text-white font-bold py-5 rounded-3xl hidden uppercase tracking-widest">KONFIRMASI ABSENSI</button>
+                    </div>
+                </div>
+
+                <!-- PANEL: MONITORING & CETAK -->
+                <div id="p-rekap" class="panel space-y-8">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl font-black text-slate-800">Monitoring & Laporan</h3>
+                        <button onclick="window.print()" class="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-50 transition"><i data-lucide="printer"></i> Cetak Laporan</button>
+                    </div>
+                    <div id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <h4 class="font-bold text-slate-800 mb-6">Aktivitas Terakhir</h4>
+                        <div id="last-activity" class="space-y-4"></div>
+                    </div>
                 </div>
 
             </main>
         </div>
     </div>
 
-    <script>
-        const API = "https://script.google.com/macros/s/AKfycbzuXpSFxgduutNzIFQe3LxjZwHDzi4x-EzL7qA_wa6Vxk5uxsDdThiYBZOefyydasAG-w/exec"; // GANTI DENGAN URL WEB APP ANDA
-        let DB = {}, curUser = {}, canvas, ctx, drawing = false, photo = "";
+    <!-- PRINT ONLY SECTION -->
+    <div class="print-only p-10 bg-white">
+        <h1 class="text-3xl font-bold text-center border-b-4 border-slate-900 pb-4 mb-6 uppercase">LAPORAN KINERJA GURU - SMKN BOJONGGAMBIR</h1>
+        <div id="print-content" class="space-y-10"></div>
+    </div>
 
+    <script>
+        // --- KONFIGURASI ---
+        const API = "https://script.google.com/macros/s/AKfycbzuXpSFxgduutNzIFQe3LxjZwHDzi4x-EzL7qA_wa6Vxk5uxsDdThiYBZOefyydasAG-w/exec"; 
+        let DB = { guru:[], kelas:[], mapel:[], siswa:[], records:[] }, curUser = {}, canvas, ctx, drawing = false, photo = "";
+
+        // --- INIT SISTEM ---
         async function initData() {
             document.getElementById('loading').style.display = 'flex';
             try {
                 const res = await fetch(API);
                 DB = await res.json();
                 fillDropdowns();
-                renderAgenda();
+                renderAll();
                 document.getElementById('loading').style.display = 'none';
-            } catch (e) { alert("Koneksi Database Gagal!"); }
+                document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { year:'numeric', month:'long', day:'numeric' });
+            } catch (e) { alert("Sistem Gagal Sinkronisasi!"); }
         }
 
         function fillDropdowns() {
             const u = DB.guru.map(g => `<option value="${g.nama_guru}">${g.nama_guru}</option>`).join('');
-            document.getElementById('l-user').innerHTML = '<option value="">-- PILIH NAMA GURU --</option>' + u;
+            document.getElementById('l-user').innerHTML = '<option value="">-- PILIH NAMA ANDA --</option>' + u;
 
             const k = DB.kelas.map(c => `<option value="${c.nama_kelas}">${c.nama_kelas}</option>`).join('');
-            document.getElementById('f-kelas').innerHTML = '<option value="">Pilih Kelas</option>' + k;
-            document.getElementById('abs-kelas').innerHTML = '<option value="">Pilih Kelas</option>' + k;
+            ['f-kelas', 'abs-kelas', 'n-kelas'].forEach(id => document.getElementById(id).innerHTML = '<option value="">Pilih Kelas</option>' + k);
 
             const m = DB.mapel.map(s => `<option value="${s.nama_mapel}">${s.nama_mapel}</option>`).join('');
-            document.getElementById('f-mapel').innerHTML = '<option value="">Pilih Mapel</option>' + m;
+            ['f-mapel', 'n-mapel'].forEach(id => document.getElementById(id).innerHTML = '<option value="">Pilih Mata Pelajaran</option>' + m);
         }
 
         async function doLogin() {
             const user = document.getElementById('l-user').value;
             const pass = document.getElementById('l-pass').value;
-            if(!user || !pass) return alert("Lengkapi data!");
+            if(!user || !pass) return alert("Pilih Nama & Masukkan Password!");
 
             const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user, pass })});
             const data = await res.json();
@@ -213,30 +248,53 @@
 
                 if(data.level === "Kepala") {
                     document.getElementById('form-agenda-box').classList.add('hidden');
+                    document.getElementById('form-nilai-box').classList.add('hidden');
                     document.getElementById('nav-abs').classList.add('hidden');
+                    document.getElementById('nav-nilai').classList.add('hidden');
                 }
-                
                 setupCanvas();
                 lucide.createIcons();
                 initData();
-            } else { alert("Password Salah!"); }
+            } else { alert("Akses Ditolak! Password Salah."); }
         }
 
-        // KAMERA
+        // --- ACTION HANDLERS ---
+        function setupCanvas() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = "#1e1b4b";
+
+            const pos = e => {
+                const r = canvas.getBoundingClientRect();
+                const t = e.touches ? e.touches[0] : e;
+                return { x: t.clientX - r.left, y: t.clientY - r.top };
+            };
+            canvas.onmousedown = e => { drawing = true; ctx.beginPath(); const p = pos(e); ctx.moveTo(p.x, p.y); };
+            canvas.onmousemove = e => { if(drawing) { const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
+            window.onmouseup = () => drawing = false;
+            canvas.ontouchstart = e => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = pos(e); ctx.moveTo(p.x, p.y); };
+            canvas.ontouchmove = e => { e.preventDefault(); if(drawing) { const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
+            canvas.ontouchend = () => drawing = false;
+        }
+
+        function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
+
         async function initCam() {
             try {
                 const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 document.getElementById('video').srcObject = s;
                 document.getElementById('cam-box').classList.remove('hidden');
                 document.getElementById('btn-cam').classList.add('hidden');
-            } catch (e) { alert("Gagal akses kamera! Pastikan izin diberikan."); }
+            } catch (e) { alert("Kamera Tidak Terdeteksi!"); }
         }
 
         function takePhoto() {
             const v = document.getElementById('video');
             const c = document.createElement('canvas');
-            c.width = 600; c.height = 450;
-            c.getContext('2d').drawImage(v, 0, 0, 600, 450);
+            c.width = 640; c.height = 480;
+            c.getContext('2d').drawImage(v, 0, 0, 640, 480);
             photo = c.toDataURL('image/jpeg', 0.6);
             document.getElementById('photo-pre').src = photo;
             document.getElementById('cam-box').classList.add('hidden');
@@ -250,67 +308,103 @@
             initCam();
         }
 
-        // CANVAS
-        function setupCanvas() {
-            canvas = document.getElementById('canvas');
-            ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.strokeStyle = "#064e3b";
-
-            const pos = e => {
-                const r = canvas.getBoundingClientRect();
-                const t = e.touches ? e.touches[0] : e;
-                return { x: t.clientX - r.left, y: t.clientY - r.top };
-            };
-            canvas.onmousedown = e => { drawing = true; ctx.beginPath(); const p = pos(e); ctx.moveTo(p.x, p.y); };
-            canvas.onmousemove = e => { if(drawing) { const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
-            window.onmouseup = () => drawing = false;
-
-            canvas.ontouchstart = e => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = pos(e); ctx.moveTo(p.x, p.y); };
-            canvas.ontouchmove = e => { e.preventDefault(); if(drawing) { const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
-            canvas.ontouchend = () => drawing = false;
+        // --- RENDER & DISPLAY ---
+        function renderAll() {
+            renderAgenda();
+            renderNilai();
+            renderStats();
+            renderActivity();
+            generatePrintReport();
         }
-        function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
 
-        // ACTIONS
-        async function saveAgenda() {
-            const data = {
-                tipe: 'agenda',
-                tgl: document.getElementById('f-tgl').value,
-                jam: document.getElementById('f-jam').value,
-                kelas: document.getElementById('f-kelas').value,
-                mapel: document.getElementById('f-mapel').value,
-                materi: document.getElementById('f-materi').value,
-                tujuan: document.getElementById('f-tujuan').value,
-                metode: document.getElementById('f-metode').value,
-                asesmen: document.getElementById('f-asesmen').value,
-                ttd: canvas.toDataURL(),
-                foto: photo,
-                guru: curUser.user
-            };
-            if(!data.tgl || !photo) return alert("Tanggal dan Foto Bukti wajib ada!");
+        function renderAgenda() {
+            let r = DB.records.filter(x => x.tipe === 'agenda');
+            if(curUser.level === "Guru") r = r.filter(x => x.nama_guru === curUser.user);
             
+            document.getElementById('t-agenda').innerHTML = r.slice(-20).reverse().map(i => `
+                <tr class="hover:bg-slate-50/50 transition duration-200">
+                    <td class="p-5 font-medium text-slate-600">${i.tanggal.split('T')[0]}</td>
+                    <td class="p-5 font-bold text-slate-800">${i.nama_guru}</td>
+                    <td class="p-5"><div class="font-bold text-indigo-600">${i.mata_pelajaran}</div><div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${i.kelas}</div></td>
+                    <td class="p-5 text-center">${i.foto_bukti ? `<a href="${i.foto_bukti}" target="_blank" class="text-indigo-500 hover:scale-110 inline-block transition"><i data-lucide="image"></i></a>` : '-'}</td>
+                    <td class="p-5 text-center">${(curUser.level === 'Admin' || i.nama_guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="text-slate-300 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '-'}</td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderNilai() {
+            let n = DB.records.filter(x => x.tipe === 'penilaian');
+            if(curUser.level === "Guru") n = n.filter(x => x.nama_guru === curUser.user);
+            document.getElementById('t-nilai').innerHTML = n.slice(-10).reverse().map(i => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-5 font-bold">${i.nama_siswa}</td>
+                    <td class="p-5 text-slate-500 font-medium">${i.mata_pelajaran}</td>
+                    <td class="p-5 text-center"><span class="bg-indigo-600 text-white px-3 py-1 rounded-lg font-black">${i.nilai}</span></td>
+                    <td class="p-5 text-center">${(curUser.level === 'Admin' || i.nama_guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="text-red-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '-'}</td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderStats() {
+            const data = [
+                { l: 'TOTAL AGENDA', v: DB.records.filter(x => x.tipe === 'agenda').length, c: 'bg-indigo-50 text-indigo-700' },
+                { l: 'DATA ABSENSI', v: DB.records.filter(x => x.tipe === 'absensi').length, c: 'bg-indigo-50 text-indigo-700' },
+                { l: 'DATA SISWA', v: DB.siswa.length, c: 'bg-slate-50 text-slate-700' },
+                { l: 'TOTAL GURU', v: DB.guru.length, c: 'bg-slate-50 text-slate-700' }
+            ];
+            document.getElementById('stats').innerHTML = data.map(d => `<div class="${d.c} p-6 rounded-3xl border border-current/5 shadow-sm"><div class="text-3xl font-black mb-1">${d.v}</div><div class="text-[10px] font-extrabold uppercase tracking-widest opacity-60">${d.l}</div></div>`).join('');
+        }
+
+        function renderActivity() {
+            const last = DB.records.slice(-5).reverse();
+            document.getElementById('last-activity').innerHTML = last.map(i => `
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50">
+                    <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><i data-lucide="${i.tipe==='agenda'?'edit-3':'users'}" class="w-4 h-4"></i></div>
+                    <div><div class="text-xs font-bold text-slate-800">${i.nama_guru} menginput ${i.tipe}</div><div class="text-[10px] text-slate-400 font-medium">${new Date(i.timestamp).toLocaleString('id-ID')}</div></div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // --- ACTIONS ---
+        async function saveAgenda() {
+            const d = { tipe:'agenda', tgl:document.getElementById('f-tgl').value, jam:document.getElementById('f-jam').value, kelas:document.getElementById('f-kelas').value, mapel:document.getElementById('f-mapel').value, materi:document.getElementById('f-materi').value, tujuan:document.getElementById('f-tujuan').value, metode:document.getElementById('f-metode').value, asesmen:document.getElementById('f-asesmen').value, ttd:canvas.toDataURL(), foto:photo, guru:curUser.user };
+            if(!d.tgl || !photo) return alert("Lengkapi Tanggal & Foto!");
             document.getElementById('loading').style.display = 'flex';
-            const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data })});
-            if(await res.text() === "OK") {
-                alert("Data Berhasil Diunggah ke Drive & Sheets!");
-                location.reload();
-            }
+            await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data:d })});
+            alert("Agenda Berhasil Terkirim!");
+            initData();
+        }
+
+        async function saveNilai() {
+            const d = { tipe:'penilaian', tgl:document.getElementById('n-tgl').value, kelas:document.getElementById('n-kelas').value, siswa:document.getElementById('n-siswa').value, mapel:document.getElementById('n-mapel').value, nilai:document.getElementById('n-angka').value, cat:document.getElementById('n-cat').value, guru:curUser.user };
+            if(!d.siswa || !d.nilai) return alert("Pilih Siswa & Isi Skor!");
+            document.getElementById('loading').style.display = 'flex';
+            await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data:d })});
+            alert("Nilai Berhasil Disimpan!");
+            initData();
+        }
+
+        async function delRec(id) {
+            if(!confirm("Hapus Permanen Data Ini?")) return;
+            document.getElementById('loading').style.display = 'flex';
+            await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'delete', rowId: id })});
+            initData();
+        }
+
+        function loadSiswaNilai() {
+            const kls = document.getElementById('n-kelas').value;
+            const s = DB.siswa.filter(x => x.kelas === kls);
+            document.getElementById('n-siswa').innerHTML = '<option value="">-- Pilih Siswa --</option>' + s.map(i => `<option value="${i.nama_siswa}">${i.nama_siswa}</option>`).join('');
         }
 
         function renderSiswa() {
             const kls = document.getElementById('abs-kelas').value;
             const s = DB.siswa.filter(x => x.kelas === kls);
-            document.getElementById('siswa-list').innerHTML = s.map(i => `
-                <div class="flex justify-between items-center p-4 bg-white border border-emerald-50 rounded-2xl shadow-sm">
-                    <span class="font-bold text-emerald-900">${i.nama_siswa}</span>
-                    <select class="abs-val border rounded-xl p-2 text-xs bg-gray-50 outline-none" data-siswa="${i.nama_siswa}">
-                        <option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option>
-                    </select>
-                </div>
-            `).join('');
-            document.getElementById('btn-save-abs').classList.toggle('hidden', s.length === 0);
+            document.getElementById('siswa-list').innerHTML = s.map(i => `<div class="flex justify-between items-center p-5 bg-white border border-slate-100 rounded-2xl shadow-sm"><span class="font-bold text-slate-700">${i.nama_siswa}</span><select class="abs-val p-2 border rounded-xl outline-none font-bold text-xs" data-siswa="${i.nama_siswa}"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select></div>`).join('');
+            document.getElementById('btn-save-abs').classList.remove('hidden');
         }
 
         async function saveAbsensi() {
@@ -321,52 +415,28 @@
             for(let v of document.querySelectorAll('.abs-val')) {
                 await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data: { tipe:'absensi', tgl, kelas:kls, siswa:v.dataset.siswa, status:v.value, guru:curUser.user }})});
             }
-            alert("Absensi Terkirim!");
+            alert("Absensi Selesai!");
             initData();
         }
 
-        function renderAgenda() {
-            let r = DB.records.filter(x => x.tipe === 'agenda');
-            if(curUser.level === "Guru") r = r.filter(x => x.nama_guru === curUser.user);
-            document.getElementById('t-agenda').innerHTML = r.reverse().map(i => `
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="p-4 border-b"><b>${i.tanggal.split('T')[0]}</b><br><span class="text-gray-400">${i.nama_guru}</span></td>
-                    <td class="p-4 border-b"><b>${i.kelas}</b><br>${i.mata_pelajaran}</td>
-                    <td class="p-4 border-b"><b>${i.materi}</b><br><span class="text-emerald-600 font-bold">${i.metode || '-'}</span></td>
-                    <td class="p-4 border-b text-center">
-                        ${i.foto_bukti ? `<a href="${i.foto_bukti}" target="_blank" class="bg-emerald-100 text-emerald-700 p-2 rounded-lg inline-block"><i data-lucide="image" class="w-4 h-4"></i></a>` : '-'}
-                    </td>
-                    <td class="p-4 border-b text-center">
-                        ${curUser.level === 'Admin' || i.nama_guru === curUser.user ? `<button onclick="delRec(${i.rowId})" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '-'}
-                    </td>
-                </tr>
-            `).join('');
-            lucide.createIcons();
-            renderStats();
-        }
-
-        async function delRec(id) {
-            if(!confirm("Hapus data?")) return;
-            document.getElementById('loading').style.display = 'flex';
-            await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'delete', rowId: id })});
-            initData();
-        }
-
-        function renderStats() {
-            const data = [
-                { l: 'Total Agenda', v: DB.records.filter(x => x.tipe === 'agenda').length, c: 'bg-blue-50 text-blue-700' },
-                { l: 'Data Absensi', v: DB.records.filter(x => x.tipe === 'absensi').length, c: 'bg-emerald-50 text-emerald-700' },
-                { l: 'Total Siswa', v: DB.siswa.length, c: 'bg-orange-50 text-orange-700' },
-                { l: 'Total Guru', v: DB.guru.length, c: 'bg-purple-50 text-purple-700' }
-            ];
-            document.getElementById('stats').innerHTML = data.map(d => `<div class="${d.c} p-4 rounded-2xl border border-current/10 font-bold"><div class="text-xl">${d.v}</div><div class="text-[9px] uppercase opacity-70">${d.l}</div></div>`).join('');
+        // --- CETAK LAPORAN ---
+        function generatePrintReport() {
+            const mine = DB.records.filter(x => x.nama_guru === curUser.user && x.tipe === 'agenda');
+            let html = `<div class="grid grid-cols-2 gap-4 mb-6"><div><p class="font-bold">Nama Guru: ${curUser.user}</p><p class="font-bold uppercase tracking-widest text-xs">Level: ${curUser.level}</p></div><div class="text-right text-xs font-bold">DICETAK PADA: ${new Date().toLocaleString()}</div></div>`;
+            html += `<table class="w-full text-[10px] border-collapse border border-slate-400"><thead><tr class="bg-slate-100"><th class="border border-slate-400 p-2">TANGGAL</th><th class="border border-slate-400 p-2">KELAS</th><th class="border border-slate-400 p-2">MATA PELAJARAN</th><th class="border border-slate-400 p-2">MATERI</th><th class="border border-slate-400 p-2">METODE</th></tr></thead><tbody>`;
+            mine.forEach(i => {
+                html += `<tr><td class="border border-slate-400 p-2">${i.tanggal.split('T')[0]}</td><td class="border border-slate-400 p-2">${i.kelas}</td><td class="border border-slate-400 p-2">${i.mata_pelajaran}</td><td class="border border-slate-400 p-2">${i.materi}</td><td class="border border-slate-400 p-2">${i.metode}</td></tr>`;
+            });
+            html += `</tbody></table>`;
+            document.getElementById('print-content').innerHTML = html;
         }
 
         function setPanel(id) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById('p-' + id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'bg-emerald-100', 'text-emerald-800'));
-            event.currentTarget.classList.add('active', 'bg-emerald-100', 'text-emerald-800');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'sidebar-item.active'));
+            event.currentTarget.classList.add('active');
+            if(id === 'rekap') generatePrintReport();
         }
 
         window.onload = initData;
