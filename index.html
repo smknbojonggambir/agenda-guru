@@ -1,137 +1,70 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <style>
-    body { background: #f4f7f6; }
-    .login-box, .form-box { max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .hidden { display: none; }
-    .header-app { background: #0056b3; color: white; padding: 15px; text-align: center; border-radius: 15px 15px 0 0; margin: -30px -30px 20px -30px; }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <!-- Section Login -->
-  <div id="loginSection" class="login-box">
-    <div class="header-app"><h4>LOGIN AGENDA SMK</h4></div>
-    <div class="mb-3">
-      <label>Username</label>
-      <input type="text" id="user" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label>Password</label>
-      <input type="password" id="pass" class="form-control">
-    </div>
-    <button class="btn btn-primary w-100" onclick="login()">Masuk</button>
-  </div>
-
-  <!-- Section Form Agenda -->
-  <div id="formSection" class="form-box hidden">
-    <div class="header-app">
-      <h4 id="welcomeText">Agenda Harian</h4>
-      <small id="userRole"></small>
-    </div>
-    
-    <form id="agendaForm">
-      <div class="mb-3">
-        <label>Tanggal</label>
-        <input type="date" id="tgl" class="form-control" required>
-      </div>
-      <div class="mb-3">
-        <label>Guru Mata Pelajaran</label>
-        <select id="selGuru" class="form-select" required></select>
-      </div>
-      <div class="mb-3">
-        <label>Kelas</label>
-        <select id="selKelas" class="form-select" onchange="filterSiswa()" required></select>
-      </div>
-      <div class="mb-3">
-        <label>Mata Pelajaran</label>
-        <select id="selMapel" class="form-select" required></select>
-      </div>
-      <div class="mb-3">
-        <label>Materi / Kegiatan</label>
-        <textarea id="materi" class="form-control" rows="3" required></textarea>
-      </div>
-      <div class="mb-3">
-        <label>Siswa Tidak Hadir (Ceklis yang Absen)</label>
-        <div id="listSiswa" class="border p-2" style="max-height:150px; overflow-y:auto;"></div>
-      </div>
-      <button type="submit" class="btn btn-success w-100">Simpan Agenda</button>
-      <button type="button" class="btn btn-light w-100 mt-2" onclick="location.reload()">Logout</button>
-    </form>
-  </div>
-</div>
-
-<script>
-  let sessionUser = "";
-  let masterSiswa = [];
-
-  function login() {
-    const u = document.getElementById('user').value;
-    const p = document.getElementById('pass').value;
-    google.script.run.withSuccessHandler(res => {
-      if(res.status === "success") {
-        sessionUser = res.nama;
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('formSection').classList.remove('hidden');
-        document.getElementById('welcomeText').innerText = "Halo, " + res.nama;
-        loadDropdowns();
+function doGet(e) {
+  var sheetName = e.parameter.sheet;
+  if (!sheetName) {
+    return ContentService.createTextOutput(JSON.stringify({ error: "Parameter sheet tidak ditemukan" }))
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+  }
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify([]))
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+  }
+  
+  var rows = sheet.getDataRange().getValues();
+  if (rows.length <= 1) {
+    return ContentService.createTextOutput(JSON.stringify([]))
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+  }
+  
+  var data = [];
+  var headers = rows[0];
+  for (var i = 1; i < rows.length; i++) {
+    var row = rows[i];
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) {
+      if (row[j] instanceof Date) {
+        obj[headers[j]] = Utilities.formatDate(row[j], Session.getScriptTimeZone(), "yyyy-MM-dd");
       } else {
-        alert("Username/Password Salah!");
+        obj[headers[j]] = row[j];
       }
-    }).checkLogin(u, p);
+    }
+    data.push(obj);
   }
+  
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+}
 
-  function loadDropdowns() {
-    google.script.run.withSuccessHandler(data => {
-      masterSiswa = data.siswa;
-      fillSelect('selGuru', data.guru);
-      fillSelect('selKelas', data.kelas);
-      fillSelect('selMapel', data.mapel);
-    }).getFormData();
-  }
-
-  function fillSelect(id, arr) {
-    let el = document.getElementById(id);
-    el.innerHTML = '<option value="">-- Pilih --</option>';
-    arr.forEach(item => { if(item) el.innerHTML += `<option value="${item}">${item}</option>`; });
-  }
-
-  function filterSiswa() {
-    const kls = document.getElementById('selKelas').value;
-    const cont = document.getElementById('listSiswa');
-    cont.innerHTML = "";
-    masterSiswa.forEach(s => {
-      if(s[0] === kls) {
-        cont.innerHTML += `<div class="form-check">
-          <input class="form-check-input" type="checkbox" value="${s[1]}" name="absen">
-          <label class="form-check-label">${s[1]}</label>
-        </div>`;
-      }
-    });
-  }
-
-  document.getElementById('agendaForm').onsubmit = function(e) {
-    e.preventDefault();
-    const absen = Array.from(document.querySelectorAll('input[name="absen"]:checked')).map(cb => cb.value).join(", ");
-    const payload = {
-      tanggal: document.getElementById('tgl').value,
-      guru: document.getElementById('selGuru').value,
-      kelas: document.getElementById('selKelas').value,
-      mapel: document.getElementById('selMapel').value,
-      materi: document.getElementById('materi').value,
-      absen: absen,
-      userInput: sessionUser
-    };
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var result = { result: "error", message: "Proses gagal" };
+  
+  try {
+    var params = JSON.parse(e.postData.contents);
+    var sheetName = params.sheetName;
+    var headers = params.headers;
+    var rowData = params.rowData;
     
-    google.script.run.withSuccessHandler(msg => {
-      alert(msg);
-      document.getElementById('agendaForm').reset();
-      document.getElementById('listSiswa').innerHTML = "";
-    }).simpanAgenda(payload);
-  };
-</script>
-</body>
-</html>
+    var sheet = ss.getSheetByName(sheetName);
+    // Jika lembar kerja (tab) belum ada, buat otomatis beserta headernya
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      sheet.appendRow(headers);
+    }
+    
+    sheet.appendRow(rowData);
+    result = { result: "success" };
+  } catch (err) {
+    result = { result: "error", message: err.toString() };
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+}
