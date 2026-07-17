@@ -128,7 +128,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycby-M6z1vWiFTKJLhC-zjCCpFku_cSpPCxGKUhsWJbsy-dW-X-sDL-42eKu3fcgwTeK0Zw/exec"; // URL GAS ANDA
+  const API_URL = "https://script.google.com/macros/s/AKfycbxuxqvaCGsOUHcBtmqEFdFPBV9q1LS0JAcJpgmBsyn1dt87EWyRGDw7QOKU1pgW5a3Qvg/exec"; // URL GAS ANDA
   let masterGuru = [];
   let masterKelas = [];
 
@@ -152,4 +152,86 @@
     masterGuru = res.guru;
     masterKelas = res.kelas;
 
-    const selG
+    const selGuru = document.getElementById('selGuru');
+    masterGuru.forEach(g => selGuru.innerHTML += `<option value="${g[0]}">${g[0]}</option>`);
+    
+    const sKGuru = document.getElementById('selKelasGuru');
+    const sKKls = document.getElementById('selKelasKls');
+    masterKelas.forEach(k => {
+      sKGuru.innerHTML += `<option value="${k[0]}">${k[0]}</option>`;
+      sKKls.innerHTML += `<option value="${k[0]}">${k[0]}</option>`;
+    });
+  }
+
+  function updateGuruDetail(el) {
+    const g = masterGuru.find(x => x[0] === el.value);
+    document.getElementById('nipGuru').value = g[1];
+    document.getElementById('mapelGuru').value = g[2];
+  }
+
+  async function fetchSiswa(kls, mode) {
+    if(mode === 'kelas') {
+        const pk = masterKelas.find(x => x[0] === kls);
+        document.getElementById('proliKls').value = pk[1];
+    }
+    const resp = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getSiswa", selectedKelas: kls }) });
+    const res = await resp.json();
+    const tbody = mode === 'guru' ? document.getElementById('listSiswaGuru') : document.getElementById('listSiswaKls');
+    tbody.innerHTML = "";
+    res.siswa.forEach((s, i) => {
+      tbody.innerHTML += `<tr>
+        <td style="font-size:12px">${s}</td>
+        <td><input type="radio" name="abs_${mode}_${i}" value="H" checked onchange="hitung('${mode}')"></td>
+        <td><input type="radio" name="abs_${mode}_${i}" value="S" onchange="hitung('${mode}')"></td>
+        <td><input type="radio" name="abs_${mode}_${i}" value="I" onchange="hitung('${mode}')"></td>
+        <td><input type="radio" name="abs_${mode}_${i}" value="A" onchange="hitung('${mode}')"></td>
+      </tr>`;
+    });
+    hitung(mode);
+  }
+
+  function hitung(mode) {
+    const prefix = mode === 'guru' ? 'abs_guru_' : 'abs_kelas_';
+    const h = document.querySelectorAll(`input[name^="${prefix}"][value="H"]:checked`).length;
+    const s = document.querySelectorAll(`input[name^="${prefix}"][value="S"]:checked`).length;
+    const i = document.querySelectorAll(`input[name^="${prefix}"][value="I"]:checked`).length;
+    const a = document.querySelectorAll(`input[name^="${prefix}"][value="A"]:checked`).length;
+    
+    if(mode === 'guru') {
+      document.getElementById('hGuru').value = h; document.getElementById('sGuru').value = s;
+      document.getElementById('iGuru').value = i; document.getElementById('aGuru').value = a;
+    } else {
+      document.getElementById('hKls').value = h; document.getElementById('sKls').value = s;
+      document.getElementById('iKls').value = i; document.getElementById('aKls').value = a;
+    }
+  }
+
+  // SUBMIT HANDLER
+  document.getElementById('formGuru').onsubmit = async function(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true; btn.innerText = "Mengirim...";
+    const fd = new FormData(e.target);
+    const payload = Object.fromEntries(fd);
+    const pw = [];
+    document.querySelectorAll('input[name="pw"]:checked').forEach(c => pw.push(c.value));
+    payload.pancawaluya = pw.join(", ");
+
+    const file = document.getElementById('fotoGuru').files[0];
+    if(file) {
+      payload.fileData = await toBase64(file);
+      payload.fileName = file.name; payload.fileType = file.type;
+    }
+
+    const resp = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "simpanGuru", payload: payload }) });
+    const res = await resp.json();
+    alert(res.message); location.reload();
+  };
+
+  const toBase64 = file => new Promise((resolve) => {
+    const reader = new FileReader(); reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+  });
+</script>
+</body>
+</html>
