@@ -3,101 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda Digital SMK</title>
+  <title>E-Agenda SMK Digital</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+    body { background: #f4f7f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .hidden { display: none; }
-    .card { border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    .navbar { background: #1E88E5 !important; }
-    .section-title { border-left: 4px solid #1E88E5; padding-left: 10px; margin: 20px 0; font-weight: bold; }
+    .card { border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .section-title { border-left: 5px solid #1E88E5; padding-left: 10px; margin: 20px 0; font-weight: bold; color: #1E88E5; }
+    .absensi-scroll { max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px; }
   </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark mb-4">
+<nav class="navbar navbar-dark bg-primary mb-4 shadow">
   <div class="container">
-    <span class="navbar-brand mb-0 h1">E-Agenda SMK</span>
-    <button id="btnLogout" class="btn btn-danger btn-sm hidden" onclick="location.reload()">Logout</button>
+    <span class="navbar-brand mb-0 h1">Digital Agenda SMK</span>
+    <button id="btnLogout" class="btn btn-light btn-sm hidden" onclick="location.reload()">Logout</button>
   </div>
 </nav>
 
 <div class="container">
   <!-- LOGIN PAGE -->
-  <div id="loginPage" class="row justify-content-center">
+  <div id="loginPage" class="row justify-content-center mt-5">
     <div class="col-md-4 card p-4">
-      <h4 class="text-center mb-4">Akses Sistem</h4>
+      <h4 class="text-center mb-4">Akses Masuk</h4>
       <input type="text" id="user" class="form-control mb-2" placeholder="Username">
       <input type="password" id="pass" class="form-control mb-3" placeholder="Password">
       <button onclick="prosesLogin()" id="btnLogin" class="btn btn-primary w-100">Login</button>
     </div>
   </div>
 
-  <!-- MAIN DASHBOARD -->
+  <!-- DASHBOARD -->
   <div id="dashboard" class="hidden">
-    <ul class="nav nav-tabs mb-4" id="myTab">
-      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabGuru">Agenda Guru</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabKelas">Agenda Kelas</button></li>
+    <div class="alert alert-info">Selamat Datang, <b id="userDisplay"></b></div>
+    
+    <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabGuru">Agenda Guru</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabKelas">Agenda Kelas</button></li>
     </ul>
 
     <div class="tab-content">
-      <!-- FORM AGENDA GURU (41 KOLOM) -->
+      <!-- FORM GURU -->
       <div class="tab-pane fade show active" id="tabGuru">
-        <form id="formGuru" class="card p-4">
-          <div class="row">
-            <div class="col-md-4">
-              <h6 class="section-title">Identitas & Waktu</h6>
-              <label>Nama Guru</label><input type="text" name="namaGuru" class="form-control mb-2" required>
-              <label>NIP</label><input type="text" name="nip" class="form-control mb-2">
-              <label>Mata Pelajaran</label><input type="text" name="mapel" class="form-control mb-2">
-              <div class="row">
-                <div class="col-6"><label>Tgl</label><input type="date" name="tanggal" class="form-control mb-2"></div>
-                <div class="col-6"><label>Hari</label><input type="text" name="hari" class="form-control mb-2"></div>
+        <form id="formGuru">
+          <div class="card p-4">
+            <div class="row">
+              <div class="col-md-4">
+                <h6 class="section-title">Identitas</h6>
+                <label>Pilih Guru</label>
+                <select name="namaGuru" id="selGuru" class="form-select mb-2" onchange="updateGuruDetail(this)" required></select>
+                <label>NIP</label><input type="text" id="nipGuru" name="nip" class="form-control mb-2" readonly>
+                <label>Mata Pelajaran</label><input type="text" id="mapelGuru" name="mapel" class="form-control mb-2" readonly>
+                <label>Tgl</label><input type="date" name="tanggal" class="form-control mb-2">
+                <label>Hari</label><input type="text" name="hari" class="form-control mb-2">
+              </div>
+              <div class="col-md-4">
+                <h6 class="section-title">Pembelajaran</h6>
+                <label>Kelas</label>
+                <select name="kelas" id="selKelasGuru" class="form-select mb-2" onchange="fetchSiswa(this.value, 'guru')"></select>
+                <label>CP</label><textarea name="cp" class="form-control mb-2" rows="1"></textarea>
+                <label>TP</label><textarea name="tp" class="form-control mb-2" rows="1"></textarea>
+                <label>Pancawaluya</label><br>
+                <div class="btn-group btn-group-sm mb-2 w-100">
+                  <input type="checkbox" class="btn-check" name="pw" id="pw1" value="Cageur"><label class="btn btn-outline-primary" for="pw1">Cageur</label>
+                  <input type="checkbox" class="btn-check" name="pw" id="pw2" value="Bageur"><label class="btn btn-outline-primary" for="pw2">Bageur</label>
+                  <input type="checkbox" class="btn-check" name="pw" id="pw3" value="Pinter"><label class="btn btn-outline-primary" for="pw3">Pinter</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <h6 class="section-title">Absensi & Foto</h6>
+                <div class="absensi-scroll bg-light p-2 mb-2">
+                   <table class="table table-sm" id="tableAbsensiGuru">
+                     <tbody id="listSiswaGuru"></tbody>
+                   </table>
+                </div>
+                <div class="row g-1 text-center mb-2">
+                   <div class="col-3"><small>H</small><input type="text" id="hGuru" name="h" class="form-control form-control-sm text-center" readonly></div>
+                   <div class="col-3"><small>S</small><input type="text" id="sGuru" name="s" class="form-control form-control-sm text-center" readonly></div>
+                   <div class="col-3"><small>I</small><input type="text" id="iGuru" name="i" class="form-control form-control-sm text-center" readonly></div>
+                   <div class="col-3"><small>A</small><input type="text" id="aGuru" name="a" class="form-control form-control-sm text-center" readonly></div>
+                </div>
+                <input type="file" id="fotoGuru" class="form-control mb-2">
               </div>
             </div>
-            
-            <div class="col-md-4">
-              <h6 class="section-title">Konten Pembelajaran</h6>
-              <label>Materi</label><input type="text" name="materi" class="form-control mb-2">
-              <label>CP</label><textarea name="cp" class="form-control mb-2" rows="1"></textarea>
-              <label>TP</label><textarea name="tp" class="form-control mb-2" rows="1"></textarea>
-              <label>Integrasi AI/TIK</label><input type="text" name="aiTik" class="form-control mb-2" placeholder="ChatGPT/Canva">
-            </div>
-
-            <div class="col-md-4">
-              <h6 class="section-title">Pancawaluya & Dokumen</h6>
-              <div class="p-2 border rounded mb-2">
-                <input type="checkbox" name="pw" value="Cageur"> Cageur 
-                <input type="checkbox" name="pw" value="Bageur"> Bageur 
-                <input type="checkbox" name="pw" value="Pinter"> Pinter
-                <input type="checkbox" name="pw" value="Singer"> Singer
-              </div>
-              <label>Upload Dokumentasi</label>
-              <input type="file" id="fotoGuru" class="form-control mb-2" accept="image/*">
-            </div>
+            <button type="submit" class="btn btn-primary mt-3 w-100">SIMPAN AGENDA GURU</button>
           </div>
-          <button type="submit" class="btn btn-primary mt-3">Simpan Agenda Guru</button>
         </form>
       </div>
 
-      <!-- FORM AGENDA KELAS (30 KOLOM) -->
+      <!-- FORM KELAS -->
       <div class="tab-pane fade" id="tabKelas">
-        <form id="formKelas" class="card p-4">
-          <div class="row">
-            <div class="col-md-6">
-              <h6 class="section-title">Data Kelas</h6>
-              <input type="text" name="kelas" placeholder="Kelas" class="form-control mb-2">
-              <input type="text" name="guru" placeholder="Guru Mengajar" class="form-control mb-2">
-              <input type="text" name="materi" placeholder="Materi" class="form-control mb-2">
-            </div>
-            <div class="col-md-6">
-              <h6 class="section-title">Kondisi Sarana</h6>
-              <select name="lcd" class="form-select mb-2"><option>LCD: Baik</option><option>LCD: Rusak</option></select>
-              <select name="internet" class="form-select mb-2"><option>Internet: Lancar</option><option>Internet: Gangguan</option></select>
-              <textarea name="catatan" class="form-control" placeholder="Catatan Kejadian"></textarea>
-            </div>
+        <form id="formKelas">
+          <div class="card p-4">
+             <div class="row">
+               <div class="col-md-6">
+                 <h6 class="section-title">Data Harian Kelas</h6>
+                 <label>Kelas</label>
+                 <select name="kelas" id="selKelasKls" class="form-select mb-2" onchange="fetchSiswa(this.value, 'kelas')"></select>
+                 <label>Program Keahlian</label><input type="text" id="proliKls" name="proli" class="form-control mb-2" readonly>
+                 <label>Guru Mengajar</label><input type="text" name="guru" class="form-control mb-2">
+                 <label>Materi</label><input type="text" name="materi" class="form-control mb-2">
+               </div>
+               <div class="col-md-6">
+                 <h6 class="section-title">Presensi Kelas</h6>
+                 <div class="absensi-scroll bg-light p-2 mb-2">
+                   <table class="table table-sm" id="tableAbsensiKls">
+                     <tbody id="listSiswaKls"></tbody>
+                   </table>
+                 </div>
+                 <div class="row g-1 text-center">
+                   <div class="col-3"><small>H</small><input type="text" id="hKls" name="h" class="form-control form-control-sm text-center" readonly></div>
+                   <div class="col-3"><small>S</small><input type="text" id="sKls" name="s" class="form-control form-control-sm text-center" readonly></div>
+                   <div class="col-3"><small>I</small><input type="text" id="iKls" name="i" class="form-control form-control-sm text-center" readonly></div>
+                   <div class="col-3"><small>A</small><input type="text" id="aKls" name="a" class="form-control form-control-sm text-center" readonly></div>
+                 </div>
+               </div>
+             </div>
+             <button type="submit" class="btn btn-success mt-4 w-100">SIMPAN AGENDA KELAS</button>
           </div>
-          <button type="submit" class="btn btn-success mt-3">Simpan Agenda Kelas</button>
         </form>
       </div>
     </div>
@@ -105,61 +128,28 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxuxqvaCGsOUHcBtmqEFdFPBV9q1LS0JAcJpgmBsyn1dt87EWyRGDw7QOKU1pgW5a3Qvg/exec"; // GANTI DENGAN URL DEPLOY ANDA
+  const API_URL = "https://script.google.com/macros/s/AKfycbxuxqvaCGsOUHcBtmqEFdFPBV9q1LS0JAcJpgmBsyn1dt87EWyRGDw7QOKU1pgW5a3Qvg/exec"; // URL GAS ANDA
+  let masterGuru = [];
+  let masterKelas = [];
 
   async function prosesLogin() {
     const user = document.getElementById('user').value;
     const pass = document.getElementById('pass').value;
-    const resp = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "login", username: user, password: pass })
-    });
+    const resp = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: user, password: pass }) });
     const res = await resp.json();
     if(res.status === "success") {
       document.getElementById('loginPage').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
       document.getElementById('btnLogout').classList.remove('hidden');
+      document.getElementById('userDisplay').innerText = res.nama;
+      initApp();
     } else { alert("User tidak ditemukan!"); }
   }
 
-  // Handle Submit Guru
-  document.getElementById('formGuru').onsubmit = async function(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.disabled = true; btn.innerText = "Proses...";
-    
-    const fd = new FormData(e.target);
-    const payload = Object.fromEntries(fd);
-    
-    // Checkbox Pancawaluya
-    const pw = [];
-    document.querySelectorAll('input[name="pw"]:checked').forEach(c => pw.push(c.value));
-    payload.pancawaluya = pw.join(", ");
-
-    // Handle File Upload
-    const file = document.getElementById('fotoGuru').files[0];
-    if(file) {
-      payload.fileData = await toBase64(file);
-      payload.fileName = file.name;
-      payload.fileType = file.type;
-    }
-
-    const resp = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "simpanGuru", payload: payload })
-    });
+  async function initApp() {
+    const resp = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getMetadata" }) });
     const res = await resp.json();
-    alert(res.message);
-    location.reload();
-  };
+    masterGuru = res.guru;
+    masterKelas = res.kelas;
 
-  const toBase64 = file => new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-  });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    const selG
