@@ -1,70 +1,501 @@
-function doGet(e) {
-  var sheetName = e.parameter.sheet;
-  if (!sheetName) {
-    return ContentService.createTextOutput(JSON.stringify({ error: "Parameter sheet tidak ditemukan" }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
-  }
-  
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(sheetName);
-  if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify([]))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
-  }
-  
-  var rows = sheet.getDataRange().getValues();
-  if (rows.length <= 1) {
-    return ContentService.createTextOutput(JSON.stringify([]))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
-  }
-  
-  var data = [];
-  var headers = rows[0];
-  for (var i = 1; i < rows.length; i++) {
-    var row = rows[i];
-    var obj = {};
-    for (var j = 0; j < headers.length; j++) {
-      if (row[j] instanceof Date) {
-        obj[headers[j]] = Utilities.formatDate(row[j], Session.getScriptTimeZone(), "yyyy-MM-dd");
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Aplikasi Agenda SMK - Guru & Kelas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header Utama -->
+  <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Sistem Buku Agenda Digital SMK</h1>
+        <p class="text-xs text-indigo-200 mt-1">Sesuai Format Agenda Kelas & Jurnal Mengajar Guru SMK</p>
+      </div>
+      <!-- Toggle Peran Utama -->
+      <div class="flex bg-indigo-900/50 p-1 rounded-xl border border-indigo-400/30">
+        <button onclick="setRole('kelas')" id="role-btn-kelas" class="px-5 py-2 rounded-lg text-sm font-semibold transition">
+          🏫 Agenda Kelas SMK
+        </button>
+        <button onclick="setRole('guru')" id="role-btn-guru" class="px-5 py-2 rounded-lg text-sm font-semibold transition">
+          👨‍🏫 Agenda Guru SMK
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow flex flex-col lg:flex-row gap-6">
+    
+    <!-- Navigasi Menu Samping / Sub-Tab Dinamis -->
+    <aside class="w-full lg:w-64 shrink-0">
+      <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">Daftar Instrumen</h2>
+        <nav id="sub-tabs-container" class="space-y-1">
+          <!-- Diisi otomatis oleh JavaScript -->
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Area Konten Utama -->
+    <main class="flex-grow space-y-6">
+      
+      <!-- Panel 1: Formulir Input -->
+      <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div onclick="toggleForm()" class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition">
+          <h3 class="font-bold text-gray-700 text-base flex items-center gap-2">
+            <span>📝</span> Tambah Data <span id="form-title-context"></span>
+          </h3>
+          <span id="form-toggle-icon" class="text-gray-400 text-sm">▼ Klik untuk Membuka</span>
+        </div>
+        <div id="form-body" class="p-6 hidden">
+          <form id="dynamic-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Elemen input form akan dibangun secara dinamis di sini -->
+          </form>
+          <div class="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+            <button onclick="submitForm()" id="btn-submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition shadow-sm text-sm">
+              Simpan Data Baru
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Tabel Data -->
+      <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50">
+          <h3 class="font-bold text-gray-700 text-base">
+            📋 Riwayat Arsip Data
+          </h3>
+          <button onclick="loadData()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded transition">
+            🔄 Segarkan Tabel
+          </button>
+        </div>
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr id="table-headers-row" class="bg-gray-100 border-b text-xs font-semibold text-gray-600 uppercase">
+                  <!-- Diisi secara dinamis -->
+                </tr>
+              </thead>
+              <tbody id="table-body-rows" class="divide-y divide-gray-200 text-gray-700">
+                <!-- Diisi secara dinamis -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="bg-gray-800 text-gray-400 py-4 text-center text-xs mt-auto">
+    <p>© 2026 Sistem Agenda Digital SMK. Dikembangkan secara modular menggunakan GitHub & Google Sheets.</p>
+  </footer>
+
+  <script>
+    // URL Google Apps Script yang telah Anda sediakan
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5kVR3jbbNOKsH9MRGCHn2LXEo4d_Ltie-jgY8har6qElZ5T_lPMAX1oZx66tgEypGXw/exec';
+
+    // Metadata Struktur Data untuk Agenda Kelas dan Guru SMK
+    const SCHEMAS = {
+      kelas: {
+        identitas: {
+          label: "Identitas Kelas",
+          sheetName: "K_Identitas",
+          headers: ["Sekolah", "Tahun Pelajaran", "Semester", "Kelas", "Program Keahlian", "Wali Kelas"],
+          fields: [
+            { name: "Sekolah", type: "text" },
+            { name: "Tahun Pelajaran", type: "text", placeholder: "e.g. 2026/2027" },
+            { name: "Semester", type: "select", options: ["Ganjil", "Genap"] },
+            { name: "Kelas", type: "text" },
+            { name: "Program Keahlian", type: "text" },
+            { name: "Wali Kelas", type: "text" }
+          ]
+        },
+        agenda_harian: {
+          label: "A. Agenda Harian Kelas",
+          sheetName: "K_Agenda_Harian",
+          headers: ["Hari/Tanggal", "Jam", "Mata Pelajaran", "Guru Pengajar", "Materi/Kegiatan", "Jumlah Hadir", "Sakit", "Izin", "Alpha", "Catatan"],
+          fields: [
+            { name: "Hari/Tanggal", type: "date" },
+            { name: "Jam", type: "text", placeholder: "e.g. 1 - 4" },
+            { name: "Mata Pelajaran", type: "text" },
+            { name: "Guru Pengajar", type: "text" },
+            { name: "Materi/Kegiatan", type: "textarea" },
+            { name: "Jumlah Hadir", type: "number" },
+            { name: "Sakit", type: "number" },
+            { name: "Izin", type: "number" },
+            { name: "Alpha", type: "number" },
+            { name: "Catatan", type: "textarea" }
+          ]
+        },
+        rekap_kehadiran: {
+          label: "B. Rekap Kehadiran Siswa",
+          sheetName: "K_Rekap_Siswa",
+          headers: ["Nama Siswa", "L/P", "Hadir", "Sakit", "Izin", "Alpha", "Terlambat", "Catatan"],
+          fields: [
+            { name: "Nama Siswa", type: "text" },
+            { name: "L/P", type: "select", options: ["L", "P"] },
+            { name: "Hadir", type: "number" },
+            { name: "Sakit", type: "number" },
+            { name: "Izin", type: "number" },
+            { name: "Alpha", type: "number" },
+            { name: "Terlambat", type: "number" },
+            { name: "Catatan", type: "textarea" }
+          ]
+        },
+        catatan_wali: {
+          label: "C. Catatan Wali Kelas",
+          sheetName: "K_Catatan_Wali",
+          headers: ["Tanggal", "Permasalahan", "Tindak Lanjut", "Orang Tua", "Keterangan"],
+          fields: [
+            { name: "Tanggal", type: "date" },
+            { name: "Permasalahan", type: "textarea" },
+            { name: "Tindak Lanjut", type: "textarea" },
+            { name: "Orang Tua", type: "select", options: ["Dipanggil", "Tidak Dipanggil"] },
+            { name: "Keterangan", type: "textarea" }
+          ]
+        },
+        kegiatan_kelas: {
+          label: "D. Kegiatan Kelas",
+          sheetName: "K_Kegiatan",
+          headers: ["Tanggal", "Nama Kegiatan", "Penanggung Jawab", "Hasil"],
+          fields: [
+            { name: "Tanggal", type: "date" },
+            { name: "Nama Kegiatan", type: "text" },
+            { name: "Penanggung Jawab", type: "text" },
+            { name: "Hasil", type: "textarea" }
+          ]
+        }
+      },
+      guru: {
+        identitas: {
+          label: "Identitas Guru",
+          sheetName: "G_Identitas",
+          headers: ["Nama Guru", "NIP/NUPTK", "Mata Pelajaran", "Program Keahlian", "Tahun Pelajaran", "Semester"],
+          fields: [
+            { name: "Nama Guru", type: "text" },
+            { name: "NIP/NUPTK", type: "text" },
+            { name: "Mata Pelajaran", type: "text" },
+            { name: "Program Keahlian", type: "text" },
+            { name: "Tahun Pelajaran", type: "text" },
+            { name: "Semester", type: "select", options: ["Ganjil", "Genap"] }
+          ]
+        },
+        agenda_mengajar: {
+          label: "A. Agenda Mengajar",
+          sheetName: "G_Agenda_Mengajar",
+          headers: ["Hari/Tanggal", "Jam Ke", "Kelas", "Mata Pelajaran", "Materi Pembelajaran", "Metode", "Media", "Kehadiran Siswa", "Catatan"],
+          fields: [
+            { name: "Hari/Tanggal", type: "date" },
+            { name: "Jam Ke", type: "text" },
+            { name: "Kelas", type: "text" },
+            { name: "Mata Pelajaran", type: "text" },
+            { name: "Materi Pembelajaran", type: "textarea" },
+            { name: "Metode", type: "text" },
+            { name: "Media", type: "text" },
+            { name: "Kehadiran Siswa", type: "text", placeholder: "e.g. Hadir: 30, Absen: 2" },
+            { name: "Catatan", type: "textarea" }
+          ]
+        },
+        jurnal_belajar: {
+          label: "B. Jurnal Pembelajaran",
+          sheetName: "G_Jurnal",
+          headers: ["Tanggal", "Kelas", "Tujuan Pembelajaran", "Materi", "Asesmen", "Refleksi Guru"],
+          fields: [
+            { name: "Tanggal", type: "date" },
+            { name: "Kelas", type: "text" },
+            { name: "Tujuan Pembelajaran", type: "textarea" },
+            { name: "Materi", type: "text" },
+            { name: "Asesmen", type: "text" },
+            { name: "Refleksi Guru", type: "textarea" }
+          ]
+        },
+        penilaian: {
+          label: "C. Penilaian",
+          sheetName: "G_Penilaian",
+          headers: ["Kelas", "Jenis Penilaian", "Materi", "Tanggal", "Nilai Rata-rata", "Tindak Lanjut"],
+          fields: [
+            { name: "Kelas", type: "text" },
+            { name: "Jenis Penilaian", type: "text", placeholder: "e.g. UH, PTS, PAS, Tugas" },
+            { name: "Materi", type: "text" },
+            { name: "Tanggal", type: "date" },
+            { name: "Nilai Rata-rata", type: "number" },
+            { name: "Tindak Lanjut", type: "textarea" }
+          ]
+        },
+        kehadiran: {
+          label: "D. Kehadiran Guru",
+          sheetName: "G_Kehadiran",
+          headers: ["Tanggal", "Jam Datang", "Jam Pulang", "Status", "Keterangan"],
+          fields: [
+            { name: "Tanggal", type: "date" },
+            { name: "Jam Datang", type: "text", placeholder: "e.g. 06.45" },
+            { name: "Jam Pulang", type: "text", placeholder: "e.g. 14.00" },
+            { name: "Status", type: "select", options: ["Hadir", "Izin", "Sakit", "Dinas Luar"] },
+            { name: "Keterangan", type: "textarea" }
+          ]
+        },
+        tugas_tambahan: {
+          label: "E. Tugas Tambahan",
+          sheetName: "G_Tugas_Tambahan",
+          headers: ["Tanggal", "Kegiatan", "Jabatan", "Hasil", "Keterangan"],
+          fields: [
+            { name: "Tanggal", type: "date" },
+            { name: "Kegiatan", type: "text" },
+            { name: "Jabatan", type: "text" },
+            { name: "Hasil", type: "textarea" },
+            { name: "Keterangan", type: "textarea" }
+          ]
+        },
+        supervisi: {
+          label: "F. Supervisi",
+          sheetName: "G_Supervisi",
+          headers: ["Tanggal", "Supervisor", "Aspek yang Dinilai", "Hasil", "Tindak Lanjut"],
+          fields: [
+            { name: "Tanggal", type: "date" },
+            { name: "Supervisor", type: "text" },
+            { name: "Aspek yang Dinilai", type: "textarea" },
+            { name: "Hasil", type: "textarea" },
+            { name: "Tindak Lanjut", type: "textarea" }
+          ]
+        }
+      }
+    };
+
+    let currentRole = 'kelas';
+    let currentTab = '';
+
+    // Menginisiasi Peran Utama (Kelas / Guru)
+    function setRole(role) {
+      currentRole = role;
+      
+      // Update Gaya Tombol
+      const btnKelas = document.getElementById('role-btn-kelas');
+      const btnGuru = document.getElementById('role-btn-guru');
+      
+      if (role === 'kelas') {
+        btnKelas.className = "px-5 py-2 rounded-lg text-sm font-semibold transition bg-white text-indigo-700 shadow-sm";
+        btnGuru.className = "px-5 py-2 rounded-lg text-sm font-semibold transition text-indigo-200 hover:text-white";
       } else {
-        obj[headers[j]] = row[j];
+        btnGuru.className = "px-5 py-2 rounded-lg text-sm font-semibold transition bg-white text-indigo-700 shadow-sm";
+        btnKelas.className = "px-5 py-2 rounded-lg text-sm font-semibold transition text-indigo-200 hover:text-white";
+      }
+
+      // Memasang daftar Sub-Tab menu samping berdasarkan Peran
+      renderSubTabs();
+    }
+
+    // Merender Menu Samping secara dinamis
+    function renderSubTabs() {
+      const container = document.getElementById('sub-tabs-container');
+      container.innerHTML = '';
+      
+      const tabKeys = Object.keys(SCHEMAS[currentRole]);
+      currentTab = tabKeys[0]; // Tab pertama aktif secara baku
+      
+      tabKeys.forEach(key => {
+        const item = SCHEMAS[currentRole][key];
+        const btn = document.createElement('button');
+        btn.id = `tab-btn-${key}`;
+        btn.innerText = item.label;
+        btn.onclick = () => selectTab(key);
+        btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-sm transition font-medium block";
+        container.appendChild(btn);
+      });
+      
+      selectTab(currentTab);
+    }
+
+    // Memilih Tab tertentu
+    function selectTab(tabKey) {
+      // Hapus gaya aktif di tab sebelumnya
+      Object.keys(SCHEMAS[currentRole]).forEach(key => {
+        const btn = document.getElementById(`tab-btn-${key}`);
+        if (btn) btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-sm transition font-medium block text-gray-600 hover:bg-gray-100 hover:text-gray-900";
+      });
+
+      currentTab = tabKey;
+      
+      // Terapkan gaya aktif pada tab yang dipilih
+      const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+      if (activeBtn) {
+        activeBtn.className = "w-full text-left px-3 py-2.5 rounded-lg text-sm transition font-bold block bg-blue-50 text-blue-700";
+      }
+
+      // Sesuaikan Judul Form
+      document.getElementById('form-title-context').innerText = SCHEMAS[currentRole][currentTab].label;
+
+      // Bangun Formulir dan Ambil Data
+      buildForm();
+      loadData();
+    }
+
+    // Membangun Formulir Input secara dinamis berdasarkan Metadata Lapangan
+    function buildForm() {
+      const form = document.getElementById('dynamic-form');
+      form.innerHTML = '';
+      
+      const schema = SCHEMAS[currentRole][currentTab];
+      
+      schema.fields.forEach(field => {
+        const container = document.createElement('div');
+        container.className = "space-y-1";
+        
+        const label = document.createElement('label');
+        label.className = "block text-xs font-bold text-gray-500 uppercase tracking-wider";
+        label.innerText = field.name;
+        container.appendChild(label);
+        
+        let input;
+        
+        if (field.type === 'textarea') {
+          input = document.createElement('textarea');
+          input.rows = 2;
+        } else if (field.type === 'select') {
+          input = document.createElement('select');
+          field.options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.text = opt;
+            input.appendChild(option);
+          });
+        } else {
+          input = document.createElement('input');
+          input.type = field.type;
+          if (field.placeholder) input.placeholder = field.placeholder;
+        }
+        
+        input.id = `input-${field.name.replace(/\s+/g, '_')}`;
+        input.required = true;
+        input.className = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition";
+        
+        container.appendChild(input);
+        form.appendChild(container);
+      });
+    }
+
+    // Mengirim Form Data ke Google Sheets
+    function submitForm() {
+      const schema = SCHEMAS[currentRole][currentTab];
+      const btnSubmit = document.getElementById('btn-submit');
+      
+      // Validasi Form
+      const formElements = document.getElementById('dynamic-form').elements;
+      let isFormValid = true;
+      for (let el of formElements) {
+        if (!el.checkValidity()) {
+          el.reportValidity();
+          isFormValid = false;
+          break;
+        }
+      }
+      if (!isFormValid) return;
+
+      btnSubmit.innerText = "Mengirim...";
+      btnSubmit.disabled = true;
+
+      // Mengumpulkan baris data sesuai urutan header
+      const rowData = [];
+      schema.fields.forEach(field => {
+        const element = document.getElementById(`input-${field.name.replace(/\s+/g, '_')}`);
+        rowData.push(element.value);
+      });
+
+      const payload = {
+        sheetName: schema.sheetName,
+        headers: schema.headers,
+        rowData: rowData
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert('Data berhasil disimpan ke Google Sheets!');
+        document.getElementById('dynamic-form').reset();
+        toggleForm(false); // Tutup formulir setelah sukses
+        loadData(); // Segarkan data tabel
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan koneksi saat menyimpan data.');
+      })
+      .finally(() => {
+        btnSubmit.innerText = "Simpan Data Baru";
+        btnSubmit.disabled = false;
+      });
+    }
+
+    // Mengambil Data dari Google Sheets untuk Tabel Dinamis
+    function loadData() {
+      const schema = SCHEMAS[currentRole][currentTab];
+      const headerRow = document.getElementById('table-headers-row');
+      const tableBody = document.getElementById('table-body-rows');
+      
+      // Persiapan Header Tabel
+      headerRow.innerHTML = '';
+      schema.headers.forEach(h => {
+        const th = document.createElement('th');
+        th.className = "p-3 whitespace-nowrap";
+        th.innerText = h;
+        headerRow.appendChild(th);
+      });
+
+      // Status memuat data
+      tableBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="p-4 text-center text-gray-400 italic">Sedang menyelaraskan data dengan Google Sheets...</td></tr>`;
+
+      fetch(`${SCRIPT_URL}?sheet=${schema.sheetName}`)
+        .then(res => res.json())
+        .then(data => {
+          tableBody.innerHTML = '';
+          if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="p-4 text-center text-gray-500 italic">Belum ada rekaman data di tab lembar kerja ini.</td></tr>`;
+            return;
+          }
+
+          data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-gray-50 border-b";
+            schema.headers.forEach(h => {
+              const td = document.createElement('td');
+              td.className = "p-3 text-gray-600 max-w-xs truncate";
+              td.innerText = row[h] !== undefined ? row[h] : '-';
+              tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          tableBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="p-4 text-center text-red-500">Gagal memuat data dari database. Silakan pastikan Google Apps Script sudah di-deploy dengan benar.</td></tr>`;
+        });
+    }
+
+    // Toggle Tampilan Formulir (Buka/Tutup)
+    function toggleForm(forceState = null) {
+      const formBody = document.getElementById('form-body');
+      const toggleIcon = document.getElementById('form-toggle-icon');
+      
+      const isHidden = forceState !== null ? !forceState : formBody.classList.contains('hidden');
+      
+      if (isHidden) {
+        formBody.classList.add('hidden');
+        toggleIcon.innerText = "▼ Klik untuk Membuka";
+      } else {
+        formBody.classList.remove('hidden');
+        toggleIcon.innerText = "▲ Klik untuk Menutup";
       }
     }
-    data.push(obj);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeaders({ 'Access-Control-Allow-Origin': '*' });
-}
 
-function doPost(e) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var result = { result: "error", message: "Proses gagal" };
-  
-  try {
-    var params = JSON.parse(e.postData.contents);
-    var sheetName = params.sheetName;
-    var headers = params.headers;
-    var rowData = params.rowData;
-    
-    var sheet = ss.getSheetByName(sheetName);
-    // Jika lembar kerja (tab) belum ada, buat otomatis beserta headernya
-    if (!sheet) {
-      sheet = ss.insertSheet(sheetName);
-      sheet.appendRow(headers);
-    }
-    
-    sheet.appendRow(rowData);
-    result = { result: "success" };
-  } catch (err) {
-    result = { result: "error", message: err.toString() };
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeaders({ 'Access-Control-Allow-Origin': '*' });
-}
+    // Inisiasi Aplikasi Pertama Kali
+    setRole('kelas');
+  </script>
+</body>
+</html>
