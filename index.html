@@ -316,14 +316,29 @@
 
                 <!-- PANEL: REKAP -->
                 <div id="p-rekap" class="panel space-y-6 sm:space-y-8">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div>
                             <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Monitoring Dashboard</h3>
                             <p class="text-slate-400 font-medium text-sm sm:text-base">Ringkasan data dan pelaporan sistem</p>
                         </div>
-                        <button onclick="window.print()" class="flex items-center justify-center gap-2 px-6 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm text-sm">
-                            <i data-lucide="printer" class="w-5 h-5"></i> Cetak Laporan Kinerja
-                        </button>
+                        
+                        <!-- CONTROLLER PILIHAN JENIS CETAK -->
+                        <div class="flex flex-wrap items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200/60 shadow-sm w-full lg:w-auto">
+                            <div class="flex flex-col min-w-[140px] flex-1 sm:flex-initial">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tipe Cetak</span>
+                                <select id="print-type" onchange="generatePrintReport()" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none cursor-pointer">
+                                    <option value="guru">Agenda Harian Guru</option>
+                                    <option value="kelas">Agenda Kelas</option>
+                                </select>
+                            </div>
+                            <div id="print-kelas-container" class="flex flex-col min-w-[120px] flex-1 sm:flex-initial hidden">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Kelas</span>
+                                <select id="print-kelas" onchange="generatePrintReport()" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none cursor-pointer"></select>
+                            </div>
+                            <button onclick="window.print()" class="flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-indigo-600 transition-all h-[38px] self-end flex-1 sm:flex-initial">
+                                <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan
+                            </button>
+                        </div>
                     </div>
 
                     <div id="stats" class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"></div>
@@ -400,6 +415,9 @@
 
             const k = DB.kelas.map(c => `<option value="${c.nama_kelas}">${c.nama_kelas}</option>`).join('');
             ['f-kelas', 'abs-kelas', 'n-kelas'].forEach(id => document.getElementById(id).innerHTML = '<option value="">Kelas</option>' + k);
+            
+            // Mengisi dropdown filter kelas untuk cetak
+            if(document.getElementById('print-kelas')) document.getElementById('print-kelas').innerHTML = k;
 
             const m = DB.mapel.map(s => `<option value="${s.nama_mapel}">${s.nama_mapel}</option>`).join('');
             ['f-mapel', 'n-mapel'].forEach(id => document.getElementById(id).innerHTML = '<option value="">Mata Pelajaran</option>' + m);
@@ -619,11 +637,46 @@
             initData();
         }
 
+        // --- DINAMISASI FITUR CETAK (GURU & KELAS) ---
         function generatePrintReport() {
-            const mine = DB.records.filter(x => x.nama_guru === curUser.user && x.tipe === 'agenda');
-            let html = `<div class="p-6 bg-slate-50 rounded-2xl border mb-6"><h2 class="text-xl font-black mb-1">${curUser.user}</h2><p class="text-xs font-bold text-indigo-600 uppercase tracking-widest">${curUser.level} - JURNAL PENGAJARAN</p></div>`;
-            html += `<table class="w-full text-[10px] border-collapse"><thead><tr class="bg-slate-900 text-white"><th class="p-3 text-left">TANGGAL</th><th class="p-3 text-left">KELAS</th><th class="p-3 text-left">MATERI</th><th class="p-3 text-left">METODE</th></tr></thead><tbody class="border border-slate-200">`;
-            mine.forEach(i => { html += `<tr class="border-b"><td class="p-3 font-bold">${i.tanggal.split('T')[0]}</td><td class="p-3 uppercase">${i.kelas}</td><td class="p-3">${i.materi}</td><td class="p-3 font-bold text-indigo-600">${i.metode || '-'}</td></tr>`; });
+            const printType = document.getElementById('print-type').value;
+            let filteredRecords = [];
+            let headerTitle = "";
+            let headerSubtitle = "";
+            let secondaryColHeader = "";
+
+            if (printType === 'guru') {
+                document.getElementById('print-kelas-container').classList.add('hidden');
+                filteredRecords = DB.records.filter(x => x.nama_guru === curUser.user && x.tipe === 'agenda');
+                headerTitle = curUser.user || "Nama Guru";
+                headerSubtitle = `${curUser.level || 'GURU'} - LAPORAN AGENDA HARIAN GURU`;
+                secondaryColHeader = "KELAS";
+            } else {
+                document.getElementById('print-kelas-container').classList.remove('hidden');
+                const selectedKelas = document.getElementById('print-kelas').value;
+                filteredRecords = DB.records.filter(x => x.kelas === selectedKelas && x.tipe === 'agenda');
+                headerTitle = `KELAS: ${selectedKelas || '-'}`;
+                headerSubtitle = "LAPORAN JURNAL / AGENDA KELAS TERPADU";
+                secondaryColHeader = "GURU MENGAJAR";
+            }
+
+            let html = `<div class="p-6 bg-slate-50 rounded-2xl border mb-6"><h2 class="text-xl font-black mb-1">${headerTitle}</h2><p class="text-xs font-bold text-indigo-600 uppercase tracking-widest">${headerSubtitle}</p></div>`;
+            html += `<table class="w-full text-[10px] border-collapse"><thead><tr class="bg-slate-900 text-white"><th class="p-3 text-left">TANGGAL</th><th class="p-3 text-left">MAPEL</th><th class="p-3 text-left">${secondaryColHeader}</th><th class="p-3 text-left">MATERI</th><th class="p-3 text-left">METODE</th></tr></thead><tbody class="border border-slate-200">`;
+            
+            if (filteredRecords.length === 0) {
+                html += `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Tidak ada data agenda yang terekam pada kategori ini.</td></tr>`;
+            } else {
+                filteredRecords.forEach(i => { 
+                    const targetSecCol = printType === 'guru' ? i.kelas : i.nama_guru;
+                    html += `<tr class="border-b">
+                        <td class="p-3 font-bold">${i.tanggal.split('T')[0]}</td>
+                        <td class="p-3 font-medium text-slate-700">${i.mata_pelajaran || '-'}</td>
+                        <td class="p-3 uppercase font-medium">${targetSecCol || '-'}</td>
+                        <td class="p-3">${i.materi || '-'}</td>
+                        <td class="p-3 font-bold text-indigo-600">${i.metode || '-'}</td>
+                    </tr>`; 
+                });
+            }
             html += `</tbody></table>`;
             document.getElementById('print-content').innerHTML = html;
         }
