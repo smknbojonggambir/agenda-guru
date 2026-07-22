@@ -764,225 +764,219 @@
 
         // --- DINAMISASI FITUR CETAK (GURU & KELAS) ---
        function generatePrintReport() {
-            // Sembunyikan elemen header default bawaan aplikasi agar murni menggunakan form cetak A4
-            const globalHeader = document.querySelector('.print-only > div:first-child');
-            if (globalHeader) globalHeader.style.display = 'none';
-            document.getElementById('print-kelas-container').classList.add('hidden');
+    // Sembunyikan elemen header default bawaan aplikasi agar murni menggunakan form cetak A4
+    const globalHeader = document.querySelector('.print-only > div:first-child');
+    if (globalHeader) globalHeader.style.display = 'none';
+    
+    // Ambil pilihan cetak dan kelas
+    const printType = document.getElementById('print-type').value;
+    const printKelasContainer = document.getElementById('print-kelas-container');
+    const selectedKelas = document.getElementById('print-kelas').value;
 
-            // --- FUNGSI GENERATOR BARIS KOSONG ---
-            const generateEmptyRows = (count, columns, height) => {
-                let rows = '';
-                for (let i = 1; i <= count; i++) {
-                    rows += `<tr style="height: ${height}px;">`;
-                    rows += `<td style="border: 1px solid black; padding: 4px; text-align: center;">${i}</td>`;
-                    for (let j = 1; j < columns; j++) {
-                        rows += `<td style="border: 1px solid black; padding: 4px;"></td>`;
-                    }
-                    rows += `</tr>`;
-                }
-                return rows;
-            };
+    // Tampilkan/Sembunyikan dropdown kelas berdasarkan tipe cetak
+    if (printType === 'kelas') {
+        printKelasContainer.classList.remove('hidden');
+    } else {
+        printKelasContainer.classList.add('hidden');
+    }
 
-            // --- INJEKSI TEMPLATE 2 HALAMAN ---
-            let html = `
-            <div style="font-family: 'Times New Roman', Calibri, serif; color: black; max-width: 100%; margin: 0 auto; line-height: 1.3;">
-                <style>
-                    @media print {
-                        @page { size: A4 portrait; margin: 1.5cm; }
-                        body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        .no-print { display: none !important; }
-                        .page-break { page-break-before: always; }
-                    }
-                    .print-table { width: 100%; border-collapse: collapse; font-size: 10pt; text-align: center; margin-bottom: 15px; }
-                    .print-table th { background-color: #e5e7eb !important; font-weight: bold; border: 1px solid black; padding: 6px 2px; }
-                    .print-table td { border: 1px solid black; padding: 4px; }
-                    .header-title { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
-                    .sub-heading { font-weight: bold; font-size: 12pt; margin-bottom: 5px; margin-top: 15px;}
-                    .identity-table { width: 100%; font-size: 11pt; margin-bottom: 15px; border: none; text-align: left; }
-                    .identity-table td { padding-bottom: 4px; border: none; }
-                    .signature-table { width: 100%; font-size: 11pt; text-align: center; margin-top: 20px; border: none; }
-                    .signature-table td { width: 33.33%; vertical-align: top; border: none; }
-                </style>
-                
-                <!-- ================= HALAMAN 1 : AGENDA GURU ================= -->
-                <div style="position: relative; height: 100%;">
-                    <div class="header-title">AGENDA HARIAN GURU SMK</div>
-                    
-                    <table class="identity-table">
-                        <tr><td style="width: 140px;">Nama Guru</td><td style="width: 15px;">:</td><td>________________________________________</td></tr>
-                        <tr><td>NIP/NUPTK</td><td>:</td><td>________________________________________</td></tr>
-                        <tr><td>Mata Pelajaran</td><td>:</td><td>________________________________________</td></tr>
-                        <tr><td>Semester</td><td>:</td><td>________________________________________</td></tr>
-                        <tr><td>Tahun Pelajaran</td><td>:</td><td>________________________________________</td></tr>
-                    </table>
+    // --- FILTER DATA DARI DATABASE ---
+    let filteredAgenda = DB.records.filter(x => x.tipe === 'agenda');
+    
+    if (printType === 'guru') {
+        filteredAgenda = filteredAgenda.filter(x => x.nama_guru === curUser.user);
+    } else if (printType === 'kelas' && selectedKelas) {
+        filteredAgenda = filteredAgenda.filter(x => x.kelas === selectedKelas);
+    }
 
-                    <table class="print-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 3%;">No</th>
-                                <th style="width: 10%;">Hari/Tanggal</th>
-                                <th style="width: 5%;">Jam Ke</th>
-                                <th style="width: 6%;">Kelas</th>
-                                <th style="width: 12%;">Mata Pelajaran</th>
-                                <th style="width: 24%;">Materi / Tujuan Pembelajaran</th>
-                                <th style="width: 10%;">Kehadiran Siswa<br>(H/S/I/A)</th>
-                                <th style="width: 10%;">Metode / Media</th>
-                                <th style="width: 10%;">Penilaian / Tugas</th>
-                                <th style="width: 5%;">Paraf<br>Guru</th>
-                                <th style="width: 5%;">Paraf<br>Waka</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${generateEmptyRows(10, 11, 38)}
-                        </tbody>
-                    </table>
-
-                    <div style="font-size: 11pt; margin-bottom: 15px;">
-                        <span class="sub-heading" style="font-size: 11pt;">Keterangan Kehadiran:</span><br>
-                        H = Hadir &nbsp;&nbsp;&nbsp;&nbsp; S = Sakit &nbsp;&nbsp;&nbsp;&nbsp; I = Izin &nbsp;&nbsp;&nbsp;&nbsp; A = Alpha
-                    </div>
-
-                    <div style="font-size: 11pt; margin-bottom: 15px;">
-                        <div class="sub-heading" style="font-size: 11pt;">Catatan Harian Guru:</div>
-                        <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
-                        <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
-                        <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
-                    </div>
-
-                    <div class="sub-heading" style="font-size: 11pt;">Rekap Mengajar Mingguan</div>
-                    <table class="print-table" style="width: 60%; margin-bottom: 10px;">
-                        <thead>
-                            <tr>
-                                <th>Hari</th><th>Jumlah Jam Mengajar</th><th>Jumlah Kelas</th><th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Total'].map(h => `
-                            <tr>
-                                <td style="text-align: left; padding-left: 8px; ${h==='Total'?'font-weight:bold;':''}">${h}</td>
-                                <td></td><td></td><td></td>
-                            </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-
-                    <table class="signature-table">
-                        <tr>
-                            <td>
-                                Mengetahui,<br>Waka Kurikulum
-                                <br><br><br><br>
-                                (______________________________)
-                            </td>
-                            <td>
-                                <br>Kepala Sekolah
-                                <br><br><br><br>
-                                (______________________________)
-                            </td>
-                            <td>
-                                <br>Guru Mata Pelajaran
-                                <br><br><br><br>
-                                (______________________________)
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <!-- PAGE BREAK UNTUK HALAMAN 2 -->
-                <div class="page-break"></div>
-
-                <!-- ================= HALAMAN 2 : AGENDA KELAS ================= -->
-                <div style="position: relative; height: 100%; padding-top: 10px;">
-                    <div class="header-title">AGENDA KELAS SMK</div>
-                    
-                    <table class="identity-table">
-                        <tr>
-                            <td style="width: 140px;">Nama Sekolah</td><td style="width: 15px;">:</td><td style="width: 45%;">________________________________________</td>
-                            <td style="width: 110px;">Wali Kelas</td><td style="width: 15px;">:</td><td>______________________________</td>
-                        </tr>
-                        <tr>
-                            <td>Kelas</td><td>:</td><td>________________________________________</td>
-                            <td>Semester</td><td>:</td><td>______________________________</td>
-                        </tr>
-                        <tr>
-                            <td>Kompetensi Keahlian</td><td>:</td><td>________________________________________</td>
-                            <td>Tahun Pelajaran</td><td>:</td><td>______________________________</td>
-                        </tr>
-                    </table>
-
-                    <table class="print-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 3%;">No</th>
-                                <th style="width: 9%;">Hari/Tanggal</th>
-                                <th style="width: 4%;">Jam<br>Ke</th>
-                                <th style="width: 12%;">Mata Pelajaran</th>
-                                <th style="width: 12%;">Guru Pengajar</th>
-                                <th style="width: 28%;">Materi/Kegiatan Pembelajaran</th>
-                                <th style="width: 9%;">Kehadiran Siswa<br>(H/S/I/A)</th>
-                                <th style="width: 13%;">Catatan Guru</th>
-                                <th style="width: 5%;">Paraf<br>Guru</th>
-                                <th style="width: 5%;">Paraf<br>Ketua</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${generateEmptyRows(12, 10, 36)}
-                        </tbody>
-                    </table>
-
-                    <!-- REKAP & CATATAN (DIBUAT SEJAJAR AGAR HEMAT RUANG HALAMAN) -->
-                    <table style="width: 100%; border: none; font-size: 11pt; margin-bottom: 5px;">
-                        <tr>
-                            <td style="width: 35%; vertical-align: top; border: none; padding-right: 20px;">
-                                <div class="sub-heading" style="font-size: 11pt; margin-top: 0;">Rekap Kehadiran Kelas</div>
-                                <table class="print-table" style="width: 100%;">
-                                    <thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead>
-                                    <tbody>
-                                        <tr><td style="text-align: left; padding-left: 8px;">Hadir</td><td></td></tr>
-                                        <tr><td style="text-align: left; padding-left: 8px;">Sakit</td><td></td></tr>
-                                        <tr><td style="text-align: left; padding-left: 8px;">Izin</td><td></td></tr>
-                                        <tr><td style="text-align: left; padding-left: 8px;">Alpha</td><td></td></tr>
-                                        <tr><td style="text-align: left; padding-left: 8px; font-weight: bold;">Total Siswa</td><td></td></tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                            <td style="width: 65%; vertical-align: top; border: none;">
-                                <div class="sub-heading" style="font-size: 11pt; margin-top: 0;">Catatan Wali Kelas / Guru:</div>
-                                <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
-                                <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
-                                <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
-                                
-                                <div style="margin-top: 15px;">
-                                    <span style="font-weight: bold;">Keterangan:</span> H = Hadir, S = Sakit, I = Izin, A = Alpha
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-
-                    <table class="signature-table">
-                        <tr>
-                            <td>
-                                Mengetahui,<br>Wakil Kepala Sekolah<br>Bidang Kurikulum
-                                <br><br><br><br>
-                                (______________________________)
-                            </td>
-                            <td>
-                                <br>Wali Kelas
-                                <br><br><br><br>
-                                (______________________________)
-                            </td>
-                            <td>
-                                <br>Ketua Kelas
-                                <br><br><br><br>
-                                (______________________________)
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            `;
-
-            document.getElementById('print-content').innerHTML = html;
+    // --- FUNGSI GENERATOR BARIS KOSONG (Fallback) ---
+    const generateEmptyRows = (count, columns, height, startNum = 1) => {
+        let rows = '';
+        for (let i = 0; i < count; i++) {
+            rows += `<tr style="height: ${height}px;">`;
+            rows += `<td style="border: 1px solid black; padding: 4px; text-align: center;">${startNum + i}</td>`;
+            for (let j = 1; j < columns; j++) {
+                rows += `<td style="border: 1px solid black; padding: 4px;"></td>`;
+            }
+            rows += `</tr>`;
         }
+        return rows;
+    };
+
+    // --- RENDER BARIS TABEL GURU ---
+    const renderGuruRows = () => {
+        let rows = '';
+        filteredAgenda.forEach((item, i) => {
+            const tgl = item.tanggal ? item.tanggal.split('T')[0] : '';
+            const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 25px; margin: auto;">` : '';
+            rows += `
+            <tr>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${i + 1}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${tgl}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.jam || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.kelas || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px;"><b>${item.materi || '-'}</b><br><span style="font-size:9pt;">${item.tujuan || ''}</span></td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">-</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.metode || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.asesmen || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle;">${ttdImg}</td>
+                <td style="border: 1px solid black; padding: 4px;"></td>
+            </tr>`;
+        });
+        
+        // Tambahkan baris kosong jika data kurang dari 10
+        if (filteredAgenda.length < 10) {
+            rows += generateEmptyRows(10 - filteredAgenda.length, 11, 38, filteredAgenda.length + 1);
+        }
+        return rows;
+    };
+
+    // --- RENDER BARIS TABEL KELAS ---
+    const renderKelasRows = () => {
+        let rows = '';
+        filteredAgenda.forEach((item, i) => {
+            const tgl = item.tanggal ? item.tanggal.split('T')[0] : '';
+            const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 25px; margin: auto;">` : '';
+            rows += `
+            <tr>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${i + 1}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${tgl}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.jam || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px;">${item.nama_guru || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px;">${item.materi || '-'}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center;">-</td>
+                <td style="border: 1px solid black; padding: 4px;">-</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle;">${ttdImg}</td>
+                <td style="border: 1px solid black; padding: 4px;"></td>
+            </tr>`;
+        });
+
+        // Tambahkan baris kosong jika data kurang dari 12
+        if (filteredAgenda.length < 12) {
+            rows += generateEmptyRows(12 - filteredAgenda.length, 10, 36, filteredAgenda.length + 1);
+        }
+        return rows;
+    };
+
+    // --- INJEKSI TEMPLATE ---
+    let html = `
+    <div style="font-family: 'Times New Roman', Calibri, serif; color: black; max-width: 100%; margin: 0 auto; line-height: 1.3;">
+        <style>
+            @media print {
+                @page { size: A4 portrait; margin: 1.5cm; }
+                body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .no-print { display: none !important; }
+            }
+            .print-table { width: 100%; border-collapse: collapse; font-size: 10pt; text-align: center; margin-bottom: 15px; }
+            .print-table th { background-color: #e5e7eb !important; font-weight: bold; border: 1px solid black; padding: 6px 2px; }
+            .print-table td { border: 1px solid black; padding: 4px; }
+            .header-title { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+            .sub-heading { font-weight: bold; font-size: 12pt; margin-bottom: 5px; margin-top: 15px;}
+            .identity-table { width: 100%; font-size: 11pt; margin-bottom: 15px; border: none; text-align: left; }
+            .identity-table td { padding-bottom: 4px; border: none; }
+            .signature-table { width: 100%; font-size: 11pt; text-align: center; margin-top: 20px; border: none; }
+            .signature-table td { width: 33.33%; vertical-align: top; border: none; }
+        </style>`;
+
+    if (printType === 'guru') {
+        // ================= HALAMAN 1 : AGENDA GURU =================
+        html += `
+        <div style="position: relative; height: 100%;">
+            <div class="header-title">AGENDA HARIAN GURU SMK</div>
+            
+            <table class="identity-table">
+                <tr><td style="width: 140px;">Nama Guru</td><td style="width: 15px;">:</td><td>${curUser.user || '________________________________________'}</td></tr>
+                <tr><td>NIP/NUPTK</td><td>:</td><td>________________________________________</td></tr>
+                <tr><td>Semester/Tahun</td><td>:</td><td>________________________________________</td></tr>
+            </table>
+
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th style="width: 3%;">No</th>
+                        <th style="width: 10%;">Hari/Tanggal</th>
+                        <th style="width: 5%;">Jam Ke</th>
+                        <th style="width: 6%;">Kelas</th>
+                        <th style="width: 12%;">Mata Pelajaran</th>
+                        <th style="width: 24%;">Materi / Tujuan Pembelajaran</th>
+                        <th style="width: 10%;">Kehadiran<br>(H/S/I/A)</th>
+                        <th style="width: 10%;">Metode</th>
+                        <th style="width: 10%;">Penilaian</th>
+                        <th style="width: 5%;">Paraf<br>Guru</th>
+                        <th style="width: 5%;">Paraf<br>Waka</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${renderGuruRows()}
+                </tbody>
+            </table>
+
+            <div style="font-size: 11pt; margin-bottom: 15px;">
+                <div class="sub-heading" style="font-size: 11pt;">Catatan Harian Guru:</div>
+                <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
+                <div style="border-bottom: 1px dotted black; height: 22px; width: 100%;"></div>
+            </div>
+
+            <table class="signature-table">
+                <tr>
+                    <td>Mengetahui,<br>Waka Kurikulum<br><br><br><br>(______________________________)</td>
+                    <td><br>Kepala Sekolah<br><br><br><br>(______________________________)</td>
+                    <td><br>Guru Mata Pelajaran<br><br><br><br>( ${curUser.user || '______________________'} )</td>
+                </tr>
+            </table>
+        </div>`;
+    } else {
+        // ================= HALAMAN 2 : AGENDA KELAS =================
+        html += `
+        <div style="position: relative; height: 100%; padding-top: 10px;">
+            <div class="header-title">AGENDA KELAS SMK</div>
+            
+            <table class="identity-table">
+                <tr>
+                    <td style="width: 140px;">Nama Sekolah</td><td style="width: 15px;">:</td><td style="width: 45%;">________________________________________</td>
+                    <td style="width: 110px;">Wali Kelas</td><td style="width: 15px;">:</td><td>______________________________</td>
+                </tr>
+                <tr>
+                    <td>Kelas</td><td>:</td><td><b>${selectedKelas || '________________________________________'}</b></td>
+                    <td>Semester</td><td>:</td><td>______________________________</td>
+                </tr>
+            </table>
+
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th style="width: 3%;">No</th>
+                        <th style="width: 9%;">Hari/Tanggal</th>
+                        <th style="width: 4%;">Jam<br>Ke</th>
+                        <th style="width: 12%;">Mata Pelajaran</th>
+                        <th style="width: 12%;">Guru Pengajar</th>
+                        <th style="width: 28%;">Materi/Kegiatan Pembelajaran</th>
+                        <th style="width: 9%;">Kehadiran<br>(H/S/I/A)</th>
+                        <th style="width: 13%;">Catatan Guru</th>
+                        <th style="width: 5%;">Paraf<br>Guru</th>
+                        <th style="width: 5%;">Paraf<br>Ketua</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${renderKelasRows()}
+                </tbody>
+            </table>
+
+            <table class="signature-table" style="margin-top: 30px;">
+                <tr>
+                    <td>Mengetahui,<br>Wakil Kepala Sekolah<br>Bidang Kurikulum<br><br><br><br>(______________________________)</td>
+                    <td><br>Wali Kelas<br><br><br><br>(______________________________)</td>
+                    <td><br>Ketua Kelas<br><br><br><br>(______________________________)</td>
+                </tr>
+            </table>
+        </div>`;
+    }
+
+    html += `</div>`;
+    document.getElementById('print-content').innerHTML = html;
+}
 
         function setPanel(id) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
