@@ -248,53 +248,61 @@
                 </div>
 
                 <!-- PANEL: NILAI -->
-                <div id="p-nilai" class="panel space-y-8 max-w-5xl mx-auto">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">E-Penilaian</h3>
-                        <div class="p-3 bg-indigo-50 rounded-2xl"><i data-lucide="award" class="text-indigo-600"></i></div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                        <div class="lg:col-span-1">
-                            <div class="glass-card p-6 rounded-[2rem] sm:rounded-[2.5rem] lg:sticky lg:top-4">
-                                <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-indigo-500"></i> Input Nilai Baru</h4>
-                                <div class="space-y-4">
-                                    <input type="date" id="n-tgl" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm">
-                                    <select id="n-kelas" onchange="loadSiswaNilai()" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm"></select>
-                                    <select id="n-siswa" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm"><option value="">Pilih Siswa</option></select>
-                                    <select id="n-mapel" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm"></select>
-                                    <div class="relative">
-                                        <input type="number" id="n-angka" placeholder="Skor Nilai" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm">
-                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-sm">/100</div>
-                                    </div>
-                                    <input type="text" id="n-cat" placeholder="Ket (Contoh: Kuis 1)" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm">
-                                    <button onclick="saveNilai()" class="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs">Simpan Nilai</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="lg:col-span-2">
-                            <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                                <div class="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                                    <h3 class="font-bold text-slate-800">Tabel Pencapaian</h3>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update Real-time</div>
-                                </div>
-                                <div class="overflow-x-auto w-full custom-scroll">
-                                    <table class="w-full text-sm min-w-[500px]">
-                                        <thead class="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-                                            <tr>
-                                                <th class="p-6 text-left">Siswa</th>
-                                                <th class="p-6 text-left">Mata Pelajaran</th>
-                                                <th class="p-6 text-center">Skor</th>
-                                                <th class="p-6 text-center">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t-nilai" class="divide-y divide-slate-50"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div id="p-nilai" class="panel space-y-8 max-w-6xl mx-auto">
+    <div class="flex items-center justify-between">
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">E-Penilaian</h3>
+        <div class="p-3 bg-indigo-50 rounded-2xl"><i data-lucide="award" class="text-indigo-600"></i></div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <!-- KIRI: Parameter Nilai -->
+        <div class="lg:col-span-1">
+            <div class="glass-card p-6 rounded-[2rem] sm:rounded-[2.5rem] lg:sticky lg:top-4">
+                <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="settings-2" class="w-4 h-4 text-indigo-500"></i> Parameter Penilaian</h4>
+                <div class="space-y-4">
+                    <input type="date" id="n-tgl" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm">
+                    <select id="n-kelas" onchange="loadSiswaNilai()" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm focus:ring-2 focus:ring-indigo-500"></select>
+                    <select id="n-mapel" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm focus:ring-2 focus:ring-indigo-500"></select>
+                    <input type="text" id="n-cat" placeholder="Ket (Contoh: Kuis 1, UTS)" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm focus:ring-2 focus:ring-indigo-500">
                 </div>
+            </div>
+        </div>
+
+        <!-- KANAN: Daftar Siswa & Input -->
+        <div class="lg:col-span-2">
+            <div class="glass-card p-6 rounded-[2rem] sm:rounded-[2.5rem] min-h-[350px] flex flex-col">
+                <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Input Nilai Kelas</h4>
+                
+                <div id="nilai-siswa-list" class="flex-1 grid grid-cols-1 gap-3 content-start">
+                    <div class="text-center py-20 text-slate-300 font-medium italic">Pilih kelas di samping untuk memunculkan daftar siswa</div>
+                </div>
+
+                <button id="btn-save-nilai" onclick="saveNilaiBatch()" class="w-full mt-6 bg-slate-900 text-white font-bold py-5 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs hidden">Simpan Semua Nilai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAWAH: Tabel Riwayat -->
+    <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden mt-8">
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50/50">
+            <h3 class="font-bold text-slate-800">Riwayat Penilaian Terakhir</h3>
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update Real-time</div>
+        </div>
+        <div class="overflow-x-auto w-full custom-scroll">
+            <table class="w-full text-sm min-w-[500px]">
+                <thead class="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                    <tr>
+                        <th class="p-6 text-left">Siswa</th>
+                        <th class="p-6 text-left">Mata Pelajaran</th>
+                        <th class="p-6 text-center">Skor</th>
+                        <th class="p-6 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="t-nilai" class="divide-y divide-slate-50"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
                 <!-- PANEL: ABSENSI -->
                 <div id="p-absensi" class="panel max-w-4xl mx-auto space-y-6 sm:space-y-8">
