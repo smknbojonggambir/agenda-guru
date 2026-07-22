@@ -56,7 +56,7 @@
             <img class="absolute inset-4 w-16 h-16 object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
         </div>
         <p class="mt-6 font-medium tracking-[0.2em] text-indigo-300 text-sm animate-pulse">SMK CLOUD SYSTEM</p>
-    </div>
+    </div>ggjjjjjjhy
 
     <!-- MODERN LOGIN -->
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4 bg-slate-50">
@@ -70,7 +70,7 @@
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Selamat Datang</h1>
                 <p class="text-slate-500 mt-2 text-sm sm:text-base font-medium">Masuk untuk akses Dashboard</p>
-            </div>
+            </div>x/////////////
 
             <div class="space-y-5 relative">
                 <div class="group">
@@ -615,41 +615,49 @@
         }
 
         // --- CRUD ACTIONS ---
-        async function saveAgenda() {
-            const ttdData = getCompressedTTD();
-            const d = { 
-                tipe:'agenda', 
-                tgl:document.getElementById('f-tgl').value, 
-                jam:document.getElementById('f-jam').value, 
-                kelas:document.getElementById('f-kelas').value, 
-                mapel:document.getElementById('f-mapel').value, 
-                materi:document.getElementById('f-materi').value, 
-                tujuan:document.getElementById('f-tujuan').value, 
-                metode:document.getElementById('f-metode').value, 
-                asesmen:document.getElementById('f-asesmen').value, 
-                ttd:ttdData, 
-                foto:photo, 
-                guru:curUser.user 
-            };
-            if(!d.tgl || !photo) return alert("Peringatan: Tanggal & Foto Bukti harus dilengkapi!");
-            
-            document.getElementById('loading').style.display = 'flex';
-            try {
-                const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data:d })});
-                if(await res.text() === "OK") {
-                    alert("Berhasil: Data Jurnal telah diarsipkan ke Cloud.");
-                    document.getElementById('f-materi').value = "";
-                    document.getElementById('f-tujuan').value = "";
-                    resetCam();
-                    clearCanvas();
-                    await refreshTransactionData();
-                }
-            } catch (e) {
-                alert("Gagal menyimpan data agenda!");
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
+       async function saveAgenda() {
+    const ttdData = getCompressedTTD();
+    const d = { 
+        tipe: 'agenda', 
+        tgl: document.getElementById('f-tgl').value, 
+        jam: document.getElementById('f-jam').value, 
+        kelas: document.getElementById('f-kelas').value, 
+        mapel: document.getElementById('f-mapel').value, 
+        materi: document.getElementById('f-materi').value, 
+        tujuan: document.getElementById('f-tujuan').value, 
+        metode: document.getElementById('f-metode').value, 
+        asesmen: document.getElementById('f-asesmen').value, 
+        ttd: ttdData, 
+        foto: photo, 
+        guru: curUser.user 
+    };
+
+    if(!d.tgl || !photo) return alert("Peringatan: Tanggal & Foto Bukti harus dilengkapi!");
+    
+    document.getElementById('loading').style.display = 'flex';
+    try {
+        const res = await fetch(API, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: 'create', data: d })
+        });
+        
+        if (res.ok) {
+            alert("Berhasil: Data Jurnal telah diarsipkan ke Cloud.");
+            document.getElementById('f-materi').value = "";
+            document.getElementById('f-tujuan').value = "";
+            resetCam();
+            clearCanvas();
+            await refreshTransactionData();
+        } else {
+            alert("Gagal menyimpan: Respon server tidak valid.");
         }
+    } catch (e) {
+        console.error("Detail Error:", e);
+        alert("Gagal menyimpan data agenda! Periksa koneksi atau console browser.");
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+}
 
         async function delRec(id) {
             if(!confirm("Hapus Permanen? Data yang sudah dihapus tidak dapat dipulihkan.")) return;
