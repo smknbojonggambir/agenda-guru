@@ -56,7 +56,7 @@
             <img class="absolute inset-4 w-16 h-16 object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
         </div>
         <p class="mt-6 font-medium tracking-[0.2em] text-indigo-300 text-sm animate-pulse">SMK CLOUD SYSTEM</p>
-    </div>ggjjjjjjhy
+    </div>
 
     <!-- MODERN LOGIN -->
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4 bg-slate-50">
@@ -71,6 +71,7 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Selamat Datang</h1>
                 <p class="text-slate-500 mt-2 text-sm sm:text-base font-medium">Masuk untuk akses Dashboard</p>
             </div>
+
             <div class="space-y-5 relative">
                 <div class="group">
                     <label class="text-[10px] font-bold text-slate-400 ml-4 mb-1 block uppercase tracking-widest">Pilih Akun Guru</label>
@@ -110,8 +111,8 @@
             
             <div class="flex items-center gap-3">
                 <div class="hidden md:flex flex-col text-right mr-4">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter" id="display-date">July 17, 2026</span>
-                    <span class="text-[10px] text-slate-300 font-medium" id="display-time">22:45 PM</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter" id="display-date">-</span>
+                    <span class="text-[10px] text-slate-300 font-medium" id="display-time">-</span>
                 </div>
                 <button onclick="location.reload()" class="p-2.5 sm:p-3 bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
@@ -122,22 +123,22 @@
         <div class="flex flex-1 overflow-hidden relative">
             <!-- LUXURY SIDEBAR -->
             <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-lg border-t border-slate-200/50 px-2 py-1 flex flex-row justify-around items-center z-50 md:static md:h-auto md:w-20 lg:w-72 md:bg-white/50 md:border-t-0 md:border-r md:p-4 md:flex-col md:justify-start md:gap-3 overflow-y-auto custom-scroll">
-                <button onclick="setPanel('agenda')" class="nav-item active group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
+                <button onclick="setPanel('agenda', this)" class="nav-item active group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-white/20 group-hover:bg-white/40 transition-colors"><i data-lucide="layout-grid" class="w-5 h-5"></i></div>
                     <span class="hidden lg:block">Agenda Harian</span>
                     <span class="block lg:hidden text-[9px] font-medium tracking-tight">Agenda</span>
                 </button>
-                <button id="nav-abs" onclick="setPanel('absensi')" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
+                <button id="nav-abs" onclick="setPanel('absensi', this)" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-slate-100 group-hover:bg-indigo-100 transition-colors"><i data-lucide="user-check" class="w-5 h-5"></i></div>
                     <span class="hidden lg:block">Presensi Siswa</span>
                     <span class="block lg:hidden text-[9px] font-medium tracking-tight">Presensi</span>
                 </button>
-                <button id="nav-nilai" onclick="setPanel('nilai')" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
+                <button id="nav-nilai" onclick="setPanel('nilai', this)" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-slate-100 group-hover:bg-indigo-100 transition-colors"><i data-lucide="award" class="w-5 h-5"></i></div>
                     <span class="hidden lg:block">E-Penilaian</span>
                     <span class="block lg:hidden text-[9px] font-medium tracking-tight">Nilai</span>
                 </button>
-                <button onclick="setPanel('rekap')" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
+                <button onclick="setPanel('rekap', this)" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-slate-100 group-hover:bg-indigo-100 transition-colors"><i data-lucide="pie-chart" class="w-5 h-5"></i></div>
                     <span class="hidden lg:block">Monitoring & Cetak</span>
                     <span class="block lg:hidden text-[9px] font-medium tracking-tight">Monitoring</span>
@@ -392,7 +393,7 @@
 
     <script>
         // --- CORE CONFIG ---
-        const API = "https://script.google.com/macros/s/AKfycby1qUkwyDOMWTGPCTxweCDYvWRZHokK5rBQgMJ0UFW9W3w_08rJOZiHcnoUq056C02Tbg/exec"; 
+        const API = "https://script.google.com/macros/s/AKfycbweAUjXW3BSR8bzqbIU0JHgVW17q-2eQc7WvgCY3K4I0fA0D8cfsk4z-vU7vA6sxd03Ng/exec"; 
         let DB = { guru:[], kelas:[], mapel:[], siswa:[], records:[] }, curUser = {}, canvas, ctx, drawing = false, photo = "";
 
         // --- INIT APP ---
@@ -405,7 +406,10 @@
                 renderAll();
                 document.getElementById('loading').style.display = 'none';
                 updateTime();
-            } catch (e) { alert("Sistem Gagal Sinkronisasi! Cek Koneksi."); }
+            } catch (e) { 
+                document.getElementById('loading').style.display = 'none';
+                alert("Sistem Gagal Sinkronisasi! Cek Koneksi Internet."); 
+            }
         }
 
         async function refreshTransactionData() {
@@ -424,24 +428,35 @@
 
         function updateTime() {
             const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-            const timeStr = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+            const dateStr = now.toLocaleDateString('id-ID', { year:'numeric', month:'long', day:'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
             document.getElementById('display-date').innerText = dateStr;
             document.getElementById('display-time').innerText = timeStr;
             document.getElementById('p-date').innerText = "Tanggal Cetak: " + dateStr;
         }
 
         function fillDropdowns() {
-            const u = DB.guru.map(g => `<option value="${g.nama_guru}">${g.nama_guru}</option>`).join('');
-            document.getElementById('l-user').innerHTML = '<option value="">-- LOGIN GURU --</option>' + u;
+            if (DB.guru && Array.isArray(DB.guru)) {
+                const u = DB.guru.map(g => `<option value="${g.nama_guru || g.guru}">${g.nama_guru || g.guru}</option>`).join('');
+                document.getElementById('l-user').innerHTML = '<option value="">-- LOGIN GURU --</option>' + u;
+            }
 
-            const k = DB.kelas.map(c => `<option value="${c.nama_kelas}">${c.nama_kelas}</option>`).join('');
-            ['f-kelas', 'abs-kelas', 'n-kelas'].forEach(id => document.getElementById(id).innerHTML = '<option value="">Kelas</option>' + k);
-            
-            if(document.getElementById('print-kelas')) document.getElementById('print-kelas').innerHTML = k;
+            if (DB.kelas && Array.isArray(DB.kelas)) {
+                const k = DB.kelas.map(c => `<option value="${c.nama_kelas || c.kelas}">${c.nama_kelas || c.kelas}</option>`).join('');
+                ['f-kelas', 'abs-kelas', 'n-kelas'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = '<option value="">Kelas</option>' + k;
+                });
+                if(document.getElementById('print-kelas')) document.getElementById('print-kelas').innerHTML = k;
+            }
 
-            const m = DB.mapel.map(s => `<option value="${s.nama_mapel}">${s.nama_mapel}</option>`).join('');
-            ['f-mapel', 'n-mapel'].forEach(id => document.getElementById(id).innerHTML = '<option value="">Mata Pelajaran</option>' + m);
+            if (DB.mapel && Array.isArray(DB.mapel)) {
+                const m = DB.mapel.map(s => `<option value="${s.nama_mapel || s.mapel}">${s.nama_mapel || s.mapel}</option>`).join('');
+                ['f-mapel', 'n-mapel'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = '<option value="">Mata Pelajaran</option>' + m;
+                });
+            }
         }
 
         async function doLogin() {
@@ -449,26 +464,36 @@
             const pass = document.getElementById('l-pass').value;
             if(!user || !pass) return alert("Pilih Akun & Input Password!");
 
-            const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user, pass })});
-            const data = await res.json();
+            document.getElementById('loading').style.display = 'flex';
 
-            if(data.status === "SUCCESS") {
-                curUser = data;
-                document.getElementById('screen-login').classList.add('hidden');
-                document.getElementById('screen-main').classList.remove('hidden');
-                document.getElementById('u-name').innerText = data.user;
-                document.getElementById('u-level').innerText = data.level;
+            try {
+                const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user, pass })});
+                const data = await res.json();
 
-                if(data.level === "Kepala") {
-                    document.getElementById('form-agenda-box').classList.add('hidden');
-                    document.getElementById('form-nilai-box')?.classList.add('hidden');
-                    document.getElementById('nav-abs').classList.add('hidden');
-                    document.getElementById('nav-nilai').classList.add('hidden');
+                if(data.status === "SUCCESS") {
+                    curUser = data;
+                    document.getElementById('screen-login').classList.add('hidden');
+                    document.getElementById('screen-main').classList.remove('hidden');
+                    document.getElementById('u-name').innerText = data.user;
+                    document.getElementById('u-level').innerText = data.level;
+
+                    if(data.level === "Kepala") {
+                        document.getElementById('form-agenda-box')?.classList.add('hidden');
+                        document.getElementById('nav-abs')?.classList.add('hidden');
+                        document.getElementById('nav-nilai')?.classList.add('hidden');
+                    }
+                    
+                    setTimeout(() => setupCanvas(), 200);
+                    lucide.createIcons();
+                    await initData();
+                } else { 
+                    alert("Verifikasi Gagal! Periksa Password."); 
                 }
-                setupCanvas();
-                lucide.createIcons();
-                initData();
-            } else { alert("Verifikasi Gagal! Periksa Password."); }
+            } catch (err) {
+                alert("Gagal melakukan login. Periksa jaringan Anda.");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
 
         // --- KAMERA & TTD OPTIMIZED ---
@@ -478,10 +503,9 @@
                 document.getElementById('video').srcObject = s;
                 document.getElementById('cam-box').classList.remove('hidden');
                 document.getElementById('btn-cam').classList.add('hidden');
-            } catch (e) { alert("Akses Kamera Ditolak!"); }
+            } catch (e) { alert("Akses Kamera Ditolak atau Tidak Tersedia!"); }
         }
 
-        // PERBAIKAN: Resize resolusi foto dan kompresi JPEG untuk transfer kilat
         function takePhoto() {
             const v = document.getElementById('video');
             const c = document.createElement('canvas');
@@ -499,15 +523,17 @@
 
         function resetCam() {
             document.getElementById('pre-box').classList.add('hidden');
+            document.getElementById('cam-box').classList.add('hidden');
+            document.getElementById('btn-cam').classList.remove('hidden');
             photo = "";
-            initCam();
         }
 
         function setupCanvas() {
             canvas = document.getElementById('canvas');
+            if (!canvas) return;
             ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            canvas.width = canvas.offsetWidth || 300;
+            canvas.height = canvas.offsetHeight || 150;
             ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = "#1e293b";
 
             const pos = e => {
@@ -523,9 +549,8 @@
             canvas.ontouchend = () => drawing = false;
         }
 
-        function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
+        function clearCanvas() { if(ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-        // FUNGSI BARU: Kompres TTD agar data payload sangat kecil & ringan
         function getCompressedTTD() {
             if (!canvas) return "";
             const tempCanvas = document.createElement('canvas');
@@ -549,46 +574,58 @@
 
         function renderAgenda() {
             let r = DB.records.filter(x => x.tipe === 'agenda');
-            if(curUser.level === "Guru") r = r.filter(x => x.nama_guru === curUser.user);
+            if(curUser.level === "Guru") r = r.filter(x => (x.nama_guru || x.guru) === curUser.user);
             
-            document.getElementById('t-agenda').innerHTML = r.slice(-15).reverse().map(i => `
+            document.getElementById('t-agenda').innerHTML = r.slice(-15).reverse().map(i => {
+                const tgl = (i.tanggal || i.tgl || '').split('T')[0];
+                const guru = i.nama_guru || i.guru || '-';
+                const mapel = i.mata_pelajaran || i.mapel || '-';
+                const foto = i.foto_bukti || i.fotoUrl || i.foto || '';
+
+                return `
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="p-6">
-                        <div class="text-slate-800 font-bold">${i.tanggal ? i.tanggal.split('T')[0] : ''}</div>
-                        <div class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">${i.nama_guru}</div>
+                        <div class="text-slate-800 font-bold">${tgl}</div>
+                        <div class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">${guru}</div>
                     </td>
                     <td class="p-6">
-                        <div class="font-bold text-slate-800">${i.mata_pelajaran}</div>
-                        <div class="text-xs text-slate-400 font-medium">${i.kelas}</div>
+                        <div class="font-bold text-slate-800">${mapel}</div>
+                        <div class="text-xs text-slate-400 font-medium">${i.kelas || '-'}</div>
                     </td>
                     <td class="p-6">
-                        <div class="text-xs font-bold text-slate-700">${i.materi}</div>
+                        <div class="text-xs font-bold text-slate-700">${i.materi || '-'}</div>
                         <div class="mt-1"><span class="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-black uppercase">${i.metode || 'N/A'}</span></div>
                     </td>
                     <td class="p-6 text-center">
-                        ${i.foto_bukti ? `<a href="${i.foto_bukti}" target="_blank" class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center mx-auto hover:bg-indigo-600 hover:text-white transition-all shadow-sm"><i data-lucide="image" class="w-4 h-4"></i></a>` : '<span class="text-slate-200">-</span>'}
+                        ${foto ? `<a href="${foto}" target="_blank" class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center mx-auto hover:bg-indigo-600 hover:text-white transition-all shadow-sm"><i data-lucide="image" class="w-4 h-4"></i></a>` : '<span class="text-slate-200">-</span>'}
                     </td>
                     <td class="p-6 text-center">
-                        ${(curUser.level === 'Admin' || i.nama_guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="p-2 text-slate-300 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '<i data-lucide="lock" class="w-4 h-4 text-slate-200 mx-auto"></i>'}
+                        ${(curUser.level === 'Admin' || guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="p-2 text-slate-300 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '<i data-lucide="lock" class="w-4 h-4 text-slate-200 mx-auto"></i>'}
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
             lucide.createIcons();
         }
 
         function renderNilai() {
             let n = DB.records.filter(x => x.tipe === 'penilaian');
-            if(curUser.level === "Guru") n = n.filter(x => x.nama_guru === curUser.user);
-            document.getElementById('t-nilai').innerHTML = n.slice(-10).reverse().map(i => `
+            if(curUser.level === "Guru") n = n.filter(x => (x.nama_guru || x.guru) === curUser.user);
+            
+            document.getElementById('t-nilai').innerHTML = n.slice(-10).reverse().map(i => {
+                const siswa = i.nama_siswa || i.siswa || '-';
+                const mapel = i.mata_pelajaran || i.mapel || '-';
+                const guru = i.nama_guru || i.guru || '';
+
+                return `
                 <tr class="hover:bg-slate-50">
-                    <td class="p-6 font-bold text-slate-800">${i.nama_siswa}</td>
-                    <td class="p-6 text-slate-500 font-medium">${i.mata_pelajaran}</td>
+                    <td class="p-6 font-bold text-slate-800">${siswa}</td>
+                    <td class="p-6 text-slate-500 font-medium">${mapel}</td>
                     <td class="p-6 text-center"><span class="bg-slate-900 text-white px-3 py-1 rounded-xl font-black text-xs">${i.nilai}</span></td>
                     <td class="p-6 text-center">
-                        ${(curUser.level === 'Admin' || i.nama_guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="text-rose-400 hover:text-rose-600"><i data-lucide="x-circle" class="w-4 h-4"></i></button>` : '-'}
+                        ${(curUser.level === 'Admin' || guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="text-rose-400 hover:text-rose-600"><i data-lucide="x-circle" class="w-4 h-4"></i></button>` : '-'}
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
             lucide.createIcons();
         }
 
@@ -596,8 +633,8 @@
             const data = [
                 { l: 'Total Jurnal', v: DB.records.filter(x => x.tipe === 'agenda').length, c: 'bg-indigo-600 text-white shadow-indigo-200' },
                 { l: 'Presensi', v: DB.records.filter(x => x.tipe === 'absensi').length, c: 'bg-white text-slate-800 border-slate-100' },
-                { l: 'Daftar Siswa', v: DB.siswa.length, c: 'bg-white text-slate-800 border-slate-100' },
-                { l: 'Akun Guru', v: DB.guru.length, c: 'bg-white text-slate-800 border-slate-100' }
+                { l: 'Daftar Siswa', v: DB.siswa ? DB.siswa.length : 0, c: 'bg-white text-slate-800 border-slate-100' },
+                { l: 'Akun Guru', v: DB.guru ? DB.guru.length : 0, c: 'bg-white text-slate-800 border-slate-100' }
             ];
             document.getElementById('stats').innerHTML = data.map(d => `<div class="${d.c} p-6 rounded-[2rem] border shadow-sm"><div class="text-3xl font-black mb-1">${d.v}</div><div class="text-[9px] font-bold uppercase tracking-widest opacity-60">${d.l}</div></div>`).join('');
         }
@@ -607,68 +644,74 @@
             document.getElementById('last-activity').innerHTML = last.map(i => `
                 <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 border border-slate-100/50">
                     <div class="p-2.5 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl"><i data-lucide="${i.tipe==='agenda'?'edit-3':'user-check'}" class="w-4 h-4"></i></div>
-                    <div><div class="text-xs font-bold text-slate-800">${i.nama_guru}</div><div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${i.tipe} diinput</div></div>
+                    <div><div class="text-xs font-bold text-slate-800">${i.nama_guru || i.guru || '-'}</div><div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">${i.tipe} diinput</div></div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
         // --- CRUD ACTIONS ---
-       async function saveAgenda() {
-    const ttdData = getCompressedTTD();
-    const d = { 
-        tipe: 'agenda', 
-        tgl: document.getElementById('f-tgl').value, 
-        jam: document.getElementById('f-jam').value, 
-        kelas: document.getElementById('f-kelas').value, 
-        mapel: document.getElementById('f-mapel').value, 
-        materi: document.getElementById('f-materi').value, 
-        tujuan: document.getElementById('f-tujuan').value, 
-        metode: document.getElementById('f-metode').value, 
-        asesmen: document.getElementById('f-asesmen').value, 
-        ttd: ttdData, 
-        foto: photo, 
-        guru: curUser.user 
-    };
+        async function saveAgenda() {
+            const ttdData = getCompressedTTD();
+            const d = { 
+                tipe: 'agenda', 
+                tgl: document.getElementById('f-tgl').value, 
+                jam: document.getElementById('f-jam').value, 
+                kelas: document.getElementById('f-kelas').value, 
+                mapel: document.getElementById('f-mapel').value, 
+                materi: document.getElementById('f-materi').value, 
+                tujuan: document.getElementById('f-tujuan').value, 
+                metode: document.getElementById('f-metode').value, 
+                asesmen: document.getElementById('f-asesmen').value, 
+                ttd: ttdData, 
+                foto: photo, 
+                guru: curUser.user 
+            };
 
-    if(!d.tgl || !photo) return alert("Peringatan: Tanggal & Foto Bukti harus dilengkapi!");
-    
-    document.getElementById('loading').style.display = 'flex';
-    try {
-        const res = await fetch(API, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: 'create', data: d })
-        });
-        
-        if (res.ok) {
-            alert("Berhasil: Data Jurnal telah diarsipkan ke Cloud.");
-            document.getElementById('f-materi').value = "";
-            document.getElementById('f-tujuan').value = "";
-            resetCam();
-            clearCanvas();
-            await refreshTransactionData();
-        } else {
-            alert("Gagal menyimpan: Respon server tidak valid.");
+            if(!d.tgl || !photo) return alert("Peringatan: Tanggal & Foto Bukti harus dilengkapi!");
+            
+            document.getElementById('loading').style.display = 'flex';
+            try {
+                const res = await fetch(API, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'create', data: d })
+                });
+                
+                if (res.ok) {
+                    alert("Berhasil: Data Jurnal telah diarsipkan ke Cloud.");
+                    document.getElementById('f-materi').value = "";
+                    document.getElementById('f-tujuan').value = "";
+                    resetCam();
+                    clearCanvas();
+                    await refreshTransactionData();
+                } else {
+                    alert("Gagal menyimpan: Respon server tidak valid.");
+                }
+            } catch (e) {
+                console.error("Detail Error:", e);
+                alert("Gagal menyimpan data agenda! Periksa koneksi.");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
-    } catch (e) {
-        console.error("Detail Error:", e);
-        alert("Gagal menyimpan data agenda! Periksa koneksi atau console browser.");
-    } finally {
-        document.getElementById('loading').style.display = 'none';
-    }
-}
 
         async function delRec(id) {
             if(!confirm("Hapus Permanen? Data yang sudah dihapus tidak dapat dipulihkan.")) return;
             document.getElementById('loading').style.display = 'flex';
-            await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'delete', rowId: id })});
-            await refreshTransactionData();
+            try {
+                await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'delete', rowId: id })});
+                await refreshTransactionData();
+            } catch (err) {
+                alert("Gagal menghapus data.");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
 
         // --- SISTEM PENUNJANG ---
         function loadSiswaNilai() {
             const kls = document.getElementById('n-kelas').value;
-            const s = DB.siswa.filter(x => x.kelas === kls);
+            const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
             
             const listContainer = document.getElementById('nilai-siswa-list');
             const btnSave = document.getElementById('btn-save-nilai');
@@ -679,14 +722,16 @@
                 return;
             }
 
-            listContainer.innerHTML = s.map(i => `
+            listContainer.innerHTML = s.map(i => {
+                const namaSiswa = i.nama_siswa || i.siswa || '';
+                return `
                 <div class="flex justify-between items-center p-4 bg-white/70 border border-slate-100 rounded-2xl shadow-sm transition-all hover:border-indigo-200 gap-4">
-                    <span class="font-bold text-slate-800 flex-1 truncate">${i.nama_siswa}</span>
+                    <span class="font-bold text-slate-800 flex-1 truncate">${namaSiswa}</span>
                     <div class="relative w-28 shrink-0">
-                        <input type="number" class="nilai-val w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm text-center focus:ring-2 focus:ring-indigo-500 font-bold" data-siswa="${i.nama_siswa}" placeholder="Skor">
+                        <input type="number" class="nilai-val w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm text-center focus:ring-2 focus:ring-indigo-500 font-bold" data-siswa="${namaSiswa}" placeholder="Skor">
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             
             btnSave.classList.remove('hidden');
         }
@@ -737,15 +782,18 @@
 
         function renderSiswa() {
             const kls = document.getElementById('abs-kelas').value;
-            const s = DB.siswa.filter(x => x.kelas === kls);
-            document.getElementById('siswa-list').innerHTML = s.map(i => `
+            const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
+            
+            document.getElementById('siswa-list').innerHTML = s.map(i => {
+                const namaSiswa = i.nama_siswa || i.siswa || '';
+                return `
                 <div class="flex justify-between items-center p-5 bg-white/70 border border-slate-100 rounded-2xl shadow-sm transition-all hover:border-indigo-200">
-                    <span class="font-bold text-slate-800">${i.nama_siswa}</span>
-                    <select class="abs-val p-3 border border-slate-200 rounded-xl outline-none font-bold text-xs bg-slate-50 cursor-pointer" data-siswa="${i.nama_siswa}">
+                    <span class="font-bold text-slate-800">${namaSiswa}</span>
+                    <select class="abs-val p-3 border border-slate-200 rounded-xl outline-none font-bold text-xs bg-slate-50 cursor-pointer" data-siswa="${namaSiswa}">
                         <option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option>
                     </select>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             document.getElementById('btn-save-abs').classList.remove('hidden');
         }
 
@@ -784,11 +832,10 @@
             }
         }
 
-        // FUNGSI UTILITY: Menghitung Rekap Kehadiran Otomatis dari Database Presensi
         function getAbsensiSummary(tgl, kelas) {
             if (!tgl || !kelas) return '-';
             const formattedTgl = tgl.split('T')[0];
-            const records = DB.records.filter(x => x.tipe === 'absensi' && x.tanggal && x.tanggal.split('T')[0] === formattedTgl && x.kelas === kelas);
+            const records = DB.records.filter(x => x.tipe === 'absensi' && (x.tanggal || x.tgl || '').split('T')[0] === formattedTgl && x.kelas === kelas);
             if (records.length === 0) return '-';
             let h = 0, s = 0, i = 0, a = 0;
             records.forEach(r => {
@@ -801,7 +848,6 @@
             return `H:${h} S:${s} I:${i} A:${a}`;
         }
 
-        // --- PERBAIKAN GENERATE PRINT REPORT ---
         function generatePrintReport() {
             const printType = document.getElementById('print-type').value;
             const printKelasContainer = document.getElementById('print-kelas-container');
@@ -816,7 +862,7 @@
             let filteredAgenda = DB.records.filter(x => x.tipe === 'agenda');
             
             if (printType === 'guru') {
-                filteredAgenda = filteredAgenda.filter(x => x.nama_guru === curUser.user);
+                filteredAgenda = filteredAgenda.filter(x => (x.nama_guru || x.guru) === curUser.user);
             } else if (printType === 'kelas' && selectedKelas) {
                 filteredAgenda = filteredAgenda.filter(x => x.kelas === selectedKelas);
             }
@@ -837,7 +883,7 @@
             const renderGuruRows = () => {
                 let rows = '';
                 filteredAgenda.forEach((item, i) => {
-                    const tgl = item.tanggal ? item.tanggal.split('T')[0] : '';
+                    const tgl = (item.tanggal || item.tgl || '').split('T')[0];
                     const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 25px; margin: auto;">` : '';
                     const kehadiranStr = getAbsensiSummary(tgl, item.kelas);
 
@@ -847,7 +893,7 @@
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${tgl}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.jam || '-'}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.kelas || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || '-'}</td>
+                        <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || item.mapel || '-'}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: left;"><b>${item.materi || '-'}</b><br><span style="font-size:8pt;">${item.tujuan || ''}</span></td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center; font-size:8pt;">${kehadiranStr}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.metode || '-'}</td>
@@ -865,7 +911,7 @@
             const renderKelasRows = () => {
                 let rows = '';
                 filteredAgenda.forEach((item, i) => {
-                    const tgl = item.tanggal ? item.tanggal.split('T')[0] : '';
+                    const tgl = (item.tanggal || item.tgl || '').split('T')[0];
                     const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 25px; margin: auto;">` : '';
                     const kehadiranStr = getAbsensiSummary(tgl, item.kelas);
 
@@ -874,8 +920,8 @@
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${i + 1}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${tgl}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.jam || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${item.nama_guru || '-'}</td>
+                        <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || item.mapel || '-'}</td>
+                        <td style="border: 1px solid black; padding: 4px;">${item.nama_guru || item.guru || '-'}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: left;">${item.materi || '-'}</td>
                         <td style="border: 1px solid black; padding: 4px; text-align: center; font-size:8pt;">${kehadiranStr}</td>
                         <td style="border: 1px solid black; padding: 4px;">-</td>
@@ -997,16 +1043,18 @@
             document.getElementById('print-content').innerHTML = html;
         }
 
-        // PERBAIKAN: Selector nav-item pada setPanel
-        function setPanel(id) {
+        function setPanel(id, btnTarget) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             const p = document.getElementById('p-' + id);
             if(p) p.classList.add('active');
 
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-            if(event && event.currentTarget && event.currentTarget.classList) {
-                event.currentTarget.classList.add('active');
+            if(btnTarget) {
+                btnTarget.classList.add('active');
+            } else if (window.event && window.event.currentTarget && window.event.currentTarget.classList) {
+                window.event.currentTarget.classList.add('active');
             }
+            
             if(id === 'rekap') generatePrintReport();
         }
 
