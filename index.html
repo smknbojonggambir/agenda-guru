@@ -212,10 +212,11 @@
                                 </div>
                             </div>
 
+                            <!-- DILAKUKAN PERUBAHAN PADA KONTAINER SISWA (TANPA SCROLL, KELUAR SEMUA) -->
                             <div class="md:col-span-2 lg:col-span-3 space-y-2">
                                 <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Presensi Siswa Kelas</label>
-                                <div id="agenda-siswa-list" class="bg-white/50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto custom-scroll">
-                                    <div class="text-center py-6 text-slate-400 text-xs font-medium italic col-span-2">Pilih kelas di atas untuk mengisi presensi secara serentak</div>
+                                <div id="agenda-siswa-list" class="bg-white/50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    <div class="text-center py-6 text-slate-400 text-xs font-medium italic col-span-full">Pilih kelas di atas untuk mengisi presensi secara serentak</div>
                                 </div>
                             </div>
 
@@ -554,14 +555,14 @@
             return tempCanvas.toDataURL('image/jpeg', 0.5);
         }
 
-        // --- LOAD SISWA DI FORM AGENDA (SATU KALI SIMPAN) ---
+        // --- LOAD SISWA DI FORM AGENDA (LANGSUNG TAMPIL SEMUA SISWA) ---
         function loadSiswaAgenda() {
             const kls = document.getElementById('f-kelas').value;
             const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
             const container = document.getElementById('agenda-siswa-list');
             
             if(!kls || s.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium italic col-span-2">Pilih kelas di atas untuk mengisi presensi serentak</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium italic col-span-full">Pilih kelas di atas untuk mengisi presensi secara serentak</div>`;
                 return;
             }
 
