@@ -625,16 +625,7 @@
             }
         }
 
-        async function saveNilai() {
-            const d = { tipe:'penilaian', tgl:document.getElementById('n-tgl').value, kelas:document.getElementById('n-kelas').value, siswa:document.getElementById('n-siswa').value, mapel:document.getElementById('n-mapel').value, nilai:document.getElementById('n-angka').value, cat:document.getElementById('n-cat').value, guru:curUser.user };
-            if(!d.siswa || !d.nilai) return alert("Error: Pilih Siswa & Input Skor Nilai!");
-            document.getElementById('loading').style.display = 'flex';
-            await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data:d })});
-            alert("Berhasil: Skor Nilai telah disimpan.");
-            
-            // Ganti initData dengan refresh partial
-            await refreshTransactionData();
-        }
+        
 
         async function delRec(id) {
             if(!confirm("Hapus Permanen? Data yang sudah dihapus tidak dapat dipulihkan.")) return;
@@ -649,7 +640,76 @@
         function loadSiswaNilai() {
             const kls = document.getElementById('n-kelas').value;
             const s = DB.siswa.filter(x => x.kelas === kls);
-            document.getElementById('n-siswa').innerHTML = '<option value="">-- PILIH SISWA --</option>' + s.map(i => `<option value="${i.nama_siswa}">${i.nama_siswa}</option>`).join('');
+            
+            const listContainer = document.getElementById('nilai-siswa-list');
+            const btnSave = document.getElementById('btn-save-nilai');
+
+            if (!kls || s.length === 0) {
+                listContainer.innerHTML = '<div class="text-center py-20 text-slate-300 font-medium italic">Pilih kelas untuk memunculkan siswa</div>';
+                btnSave.classList.add('hidden');
+                return;
+            }
+
+            listContainer.innerHTML = s.map(i => `
+                <div class="flex justify-between items-center p-4 bg-white/70 border border-slate-100 rounded-2xl shadow-sm transition-all hover:border-indigo-200 gap-4">
+                    <span class="font-bold text-slate-800 flex-1 truncate">${i.nama_siswa}</span>
+                    <div class="relative w-28 shrink-0">
+                        <input type="number" class="nilai-val w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm text-center focus:ring-2 focus:ring-indigo-500 font-bold" data-siswa="${i.nama_siswa}" placeholder="Skor">
+                    </div>
+                </div>
+            `).join('');
+            
+            btnSave.classList.remove('hidden');
+        }
+
+        async function saveNilaiBatch() {
+            const tgl = document.getElementById('n-tgl').value;
+            const kls = document.getElementById('n-kelas').value;
+            const mapel = document.getElementById('n-mapel').value;
+            const cat = document.getElementById('n-cat').value;
+
+            if(!tgl || !mapel) return alert("Peringatan: Tanggal dan Mata Pelajaran harus diisi!");
+            
+            let batchData = [];
+            
+            // Looping ke semua input nilai, hanya ambil yang angkanya diisi
+            for(let v of document.querySelectorAll('.nilai-val')) {
+                if(v.value !== "") { 
+                    batchData.push({ 
+                        tipe: 'penilaian', 
+                        tgl: tgl, 
+                        kelas: kls, 
+                        siswa: v.dataset.siswa, 
+                        mapel: mapel, 
+                        nilai: v.value, 
+                        cat: cat, 
+                        guru: curUser.user 
+                    });
+                }
+            }
+
+            if(batchData.length === 0) return alert("Peringatan: Belum ada skor nilai yang diinput satupun!");
+
+            document.getElementById('loading').style.display = 'flex';
+
+            try {
+                // Menggunakan sistem create_batch yang sama seperti absensi
+                await fetch(API, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'create_batch', data: batchData })
+                });
+                
+                alert(`Berhasil: ${batchData.length} Data Nilai telah disimpan.`);
+                
+                // Kosongkan inputan skor setelah berhasil
+                document.querySelectorAll('.nilai-val').forEach(input => input.value = "");
+                
+                await refreshTransactionData(); 
+            } catch (error) {
+                alert("Gagal menyimpan nilai: " + error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
 
         function renderSiswa() {
