@@ -125,13 +125,8 @@
             <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-lg border-t border-slate-200/50 px-2 py-1 flex flex-row justify-around items-center z-50 md:static md:h-auto md:w-20 lg:w-72 md:bg-white/50 md:border-t-0 md:border-r md:p-4 md:flex-col md:justify-start md:gap-3 overflow-y-auto custom-scroll">
                 <button onclick="setPanel('agenda', this)" class="nav-item active group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-white/20 group-hover:bg-white/40 transition-colors"><i data-lucide="layout-grid" class="w-5 h-5"></i></div>
-                    <span class="hidden lg:block">Agenda Harian</span>
+                    <span class="hidden lg:block">Agenda & Presensi</span>
                     <span class="block lg:hidden text-[9px] font-medium tracking-tight">Agenda</span>
-                </button>
-                <button id="nav-abs" onclick="setPanel('absensi', this)" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
-                    <div class="p-2 rounded-lg bg-slate-100 group-hover:bg-indigo-100 transition-colors"><i data-lucide="user-check" class="w-5 h-5"></i></div>
-                    <span class="hidden lg:block">Presensi Siswa</span>
-                    <span class="block lg:hidden text-[9px] font-medium tracking-tight">Presensi</span>
                 </button>
                 <button id="nav-nilai" onclick="setPanel('nilai', this)" class="nav-item group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl text-slate-500 font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-slate-100 group-hover:bg-indigo-100 transition-colors"><i data-lucide="award" class="w-5 h-5"></i></div>
@@ -148,12 +143,12 @@
             <!-- MAIN VIEWPORT -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 pb-28 md:pb-10 custom-scroll relative w-full">
                 
-                <!-- PANEL: AGENDA -->
+                <!-- PANEL: AGENDA & PRESENSI INTEGRATED -->
                 <div id="p-agenda" class="panel active space-y-6 sm:space-y-8 max-w-6xl mx-auto">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Jurnal Mengajar</h3>
-                            <p class="text-slate-400 text-sm sm:text-base font-medium">Rekam aktivitas pembelajaran hari ini</p>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Jurnal Mengajar & Presensi</h3>
+                            <p class="text-slate-400 text-sm sm:text-base font-medium">Isi jurnal mengajar dan kehadiran siswa sekaligus dalam sekali simpan</p>
                         </div>
                         <div class="flex gap-2 self-end sm:self-auto">
                             <button onclick="refreshTransactionData()" class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200 text-indigo-600 hover:bg-indigo-50 transition-all"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
@@ -161,6 +156,11 @@
                     </div>
 
                     <div id="form-agenda-box" class="glass-card p-4 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem]">
+                        <div id="editing-banner" class="hidden mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs font-bold flex justify-between items-center">
+                            <span>Sedang Mengedit Record ID: <span id="editing-id">-</span></span>
+                            <button onclick="cancelEditAgenda()" class="px-3 py-1 bg-amber-200 hover:bg-amber-300 rounded-xl text-amber-900 font-bold text-[10px]">Batal Edit</button>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             <div class="space-y-2">
                                 <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Waktu</label>
@@ -172,7 +172,7 @@
                             <div class="space-y-2">
                                 <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Penempatan</label>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <select id="f-kelas" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"></select>
+                                    <select id="f-kelas" onchange="loadSiswaAgenda()" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"></select>
                                     <select id="f-mapel" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"></select>
                                 </div>
                             </div>
@@ -212,27 +212,37 @@
                                 </div>
                             </div>
 
-                            <div class="md:col-span-2 space-y-2">
+                            <div class="md:col-span-2 lg:col-span-3 space-y-2">
+                                <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Presensi Siswa Kelas</label>
+                                <div id="agenda-siswa-list" class="bg-white/50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto custom-scroll">
+                                    <div class="text-center py-6 text-slate-400 text-xs font-medium italic col-span-2">Pilih kelas di atas untuk mengisi presensi secara serentak</div>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2 lg:col-span-3 space-y-2">
                                 <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Validasi Tanda Tangan</label>
                                 <div class="bg-white border-2 border-slate-100 rounded-3xl p-1 relative overflow-hidden">
-                                    <canvas id="canvas" class="w-full h-44"></canvas>
+                                    <canvas id="canvas" class="w-full h-36"></canvas>
                                     <button onclick="clearCanvas()" class="absolute bottom-4 right-4 bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-bold hover:bg-rose-50 hover:text-rose-500 transition-colors">RESET TTD</button>
                                 </div>
                             </div>
 
                             <div class="md:col-span-2 lg:col-span-3 pt-4">
-                                <button onclick="saveAgenda()" class="w-full bg-slate-900 text-white font-bold py-5 rounded-3xl shadow-2xl shadow-indigo-200 hover:bg-indigo-600 transition-all flex items-center justify-center gap-3 group">
+                                <button id="btn-submit-agenda" onclick="saveAgendaIntegrated()" class="w-full bg-slate-900 text-white font-bold py-5 rounded-3xl shadow-2xl shadow-indigo-200 hover:bg-indigo-600 transition-all flex items-center justify-center gap-3 group">
                                     <i data-lucide="send" class="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
-                                    <span class="uppercase tracking-widest text-sm sm:text-base">Simpan Jurnal Pembelajaran</span>
+                                    <span id="btn-submit-text" class="uppercase tracking-widest text-sm sm:text-base">Simpan Jurnal & Presensi Sekaligus</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="p-6 border-b border-slate-50 bg-slate-50/50 flex items-center gap-2">
-                            <i data-lucide="history" class="w-5 h-5 text-indigo-500"></i>
-                            <h3 class="font-bold text-slate-800">Riwayat Jurnal Terakhir</h3>
+                        <div class="p-6 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="history" class="w-5 h-5 text-indigo-500"></i>
+                                <h3 class="font-bold text-slate-800">Riwayat Jurnal Terakhir</h3>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fitur Edit & Hapus Active</span>
                         </div>
                         <div class="overflow-x-auto w-full custom-scroll">
                             <table class="w-full text-sm min-w-[700px]">
@@ -242,7 +252,7 @@
                                         <th class="p-6 text-left">Mapel/Kelas</th>
                                         <th class="p-6 text-left">Materi/Metode</th>
                                         <th class="p-6 text-center">Bukti</th>
-                                        <th class="p-6 text-center">Aksi</th>
+                                        <th class="p-6 text-center">Aksi (CRUD)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="t-agenda" class="divide-y divide-slate-50"></tbody>
@@ -302,25 +312,6 @@
                                 <tbody id="t-nilai" class="divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
-
-                <!-- PANEL: ABSENSI -->
-                <div id="p-absensi" class="panel max-w-4xl mx-auto space-y-6 sm:space-y-8">
-                    <div class="text-center">
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Presensi Kehadiran</h3>
-                        <p class="text-slate-400 font-medium text-sm sm:text-base">Lakukan absensi siswa secara kolektif</p>
-                    </div>
-
-                    <div class="glass-card p-4 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem]">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                            <input type="date" id="abs-tgl" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm">
-                            <select id="abs-kelas" onchange="renderSiswa()" class="w-full p-4 bg-white/50 border border-slate-200 rounded-2xl outline-none text-sm"></select>
-                        </div>
-                        <div id="siswa-list" class="grid grid-cols-1 gap-3 pr-2">
-                            <div class="text-center py-20 text-slate-300 font-medium italic">Pilih kelas untuk memunculkan daftar siswa</div>
-                        </div>
-                        <button id="btn-save-abs" onclick="saveAbsensi()" class="w-full mt-10 bg-slate-900 text-white font-black py-5 rounded-3xl hidden uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-200 text-sm">Submit Presensi Harian</button>
                     </div>
                 </div>
 
@@ -395,6 +386,7 @@
         // --- CORE CONFIG ---
         const API = "https://script.google.com/macros/s/AKfycbxt8rwOiASudNeayuW4hK3qk66Bp5uR6LyogLv1n_IUb-styCzOb4ZWSANLXEmTezFuhg/exec"; 
         let DB = { guru:[], kelas:[], mapel:[], siswa:[], records:[] }, curUser = {}, canvas, ctx, drawing = false, photo = "";
+        let editingRowId = null;
 
         // --- INIT APP ---
         async function initData() {
@@ -443,7 +435,7 @@
 
             if (DB.kelas && Array.isArray(DB.kelas)) {
                 const k = DB.kelas.map(c => `<option value="${c.nama_kelas || c.kelas}">${c.nama_kelas || c.kelas}</option>`).join('');
-                ['f-kelas', 'abs-kelas', 'n-kelas'].forEach(id => {
+                ['f-kelas', 'n-kelas'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.innerHTML = '<option value="">Kelas</option>' + k;
                 });
@@ -479,7 +471,6 @@
 
                     if(data.level === "Kepala") {
                         document.getElementById('form-agenda-box')?.classList.add('hidden');
-                        document.getElementById('nav-abs')?.classList.add('hidden');
                         document.getElementById('nav-nilai')?.classList.add('hidden');
                     }
                     
@@ -563,6 +554,29 @@
             return tempCanvas.toDataURL('image/jpeg', 0.5);
         }
 
+        // --- LOAD SISWA DI FORM AGENDA (SATU KALI SIMPAN) ---
+        function loadSiswaAgenda() {
+            const kls = document.getElementById('f-kelas').value;
+            const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
+            const container = document.getElementById('agenda-siswa-list');
+            
+            if(!kls || s.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium italic col-span-2">Pilih kelas di atas untuk mengisi presensi serentak</div>`;
+                return;
+            }
+
+            container.innerHTML = s.map(i => {
+                const namaSiswa = i.nama_siswa || i.siswa || '';
+                return `
+                <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                    <span class="font-bold text-xs text-slate-800 truncate mr-2">${namaSiswa}</span>
+                    <select class="agenda-abs-val p-1.5 border border-slate-200 rounded-lg outline-none font-bold text-xs bg-slate-50" data-siswa="${namaSiswa}">
+                        <option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option>
+                    </select>
+                </div>`;
+            }).join('');
+        }
+
         // --- LOGIC RENDER ---
         function renderAll() {
             renderAgenda();
@@ -600,7 +614,12 @@
                         ${foto ? `<a href="${foto}" target="_blank" class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center mx-auto hover:bg-indigo-600 hover:text-white transition-all shadow-sm"><i data-lucide="image" class="w-4 h-4"></i></a>` : '<span class="text-slate-200">-</span>'}
                     </td>
                     <td class="p-6 text-center">
-                        ${(curUser.level === 'Admin' || guru === curUser.user) ? `<button onclick="delRec(${i.rowId})" class="p-2 text-slate-300 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '<i data-lucide="lock" class="w-4 h-4 text-slate-200 mx-auto"></i>'}
+                        <div class="flex justify-center items-center gap-2">
+                            ${(curUser.level === 'Admin' || guru === curUser.user) ? `
+                                <button onclick="editAgenda(${i.rowId})" class="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit Jurnal"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                <button onclick="delRec(${i.rowId})" class="p-2 text-slate-300 hover:text-rose-500 transition-colors" title="Hapus Permanen"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            ` : '<i data-lucide="lock" class="w-4 h-4 text-slate-200 mx-auto"></i>'}
+                        </div>
                     </td>
                 </tr>`;
             }).join('');
@@ -650,8 +669,8 @@
             lucide.createIcons();
         }
 
-        // --- CRUD ACTIONS ---
-        async function saveAgenda() {
+        // --- CRUD ACTIONS (INTEGRATED SATU KALI SIMPAN) ---
+        async function saveAgendaIntegrated() {
             const ttdData = getCompressedTTD();
             const d = { 
                 tipe: 'agenda', 
@@ -668,33 +687,99 @@
                 guru: curUser.user 
             };
 
-            if(!d.tgl || !photo) return alert("Peringatan: Tanggal & Foto Bukti harus dilengkapi!");
-            
+            if(!d.tgl) return alert("Peringatan: Tanggal harus diisi!");
+
+            // Ambil data presensi jika ada
+            let absData = [];
+            document.querySelectorAll('.agenda-abs-val').forEach(el => {
+                absData.push({
+                    tipe: 'absensi',
+                    tgl: d.tgl,
+                    kelas: d.kelas,
+                    siswa: el.dataset.siswa,
+                    status: el.value,
+                    guru: curUser.user
+                });
+            });
+
             document.getElementById('loading').style.display = 'flex';
             try {
-                const res = await fetch(API, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: 'create', data: d })
-                });
-                
-                if (res.ok) {
-                    alert("Berhasil: Data Jurnal telah diarsipkan ke Cloud.");
-                    document.getElementById('f-materi').value = "";
-                    document.getElementById('f-tujuan').value = "";
-                    resetCam();
-                    clearCanvas();
-                    await refreshTransactionData();
+                // Jika sedang Mode Edit (UPDATE)
+                if (editingRowId) {
+                    await fetch(API, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'update', rowId: editingRowId, data: d })
+                    });
+                    alert("Berhasil: Jurnal Pembelajaran berhasil diperbarui!");
+                    cancelEditAgenda();
                 } else {
-                    alert("Gagal menyimpan: Respon server tidak valid.");
+                    // Mode Tambah Baru (CREATE INTEGRATED)
+                    await fetch(API, { 
+                        method: 'POST', 
+                        body: JSON.stringify({ action: 'create', data: d })
+                    });
+
+                    // Simpan data Absensi secara otomatis sekaligus
+                    if (absData.length > 0) {
+                        await fetch(API, {
+                            method: 'POST',
+                            body: JSON.stringify({ action: 'create_batch', data: absData })
+                        });
+                    }
+                    alert("Berhasil: Jurnal Pembelajaran & Presensi Siswa tersimpan dalam 1 kali simpan!");
                 }
+
+                // Reset Form
+                document.getElementById('f-materi').value = "";
+                document.getElementById('f-tujuan').value = "";
+                resetCam();
+                clearCanvas();
+                await refreshTransactionData();
+
             } catch (e) {
                 console.error("Detail Error:", e);
-                alert("Gagal menyimpan data agenda! Periksa koneksi.");
+                alert("Gagal menyimpan data! Periksa koneksi.");
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
+        // EDIT RECORD (AGENDA UPDATE)
+        function editAgenda(rowId) {
+            const item = DB.records.find(x => x.rowId === rowId);
+            if (!item) return alert("Data tidak ditemukan!");
+
+            editingRowId = rowId;
+            document.getElementById('editing-banner').classList.remove('hidden');
+            document.getElementById('editing-id').innerText = rowId;
+            document.getElementById('btn-submit-text').innerText = "UPDATE DATA JURNAL";
+
+            // Populate Form Fields
+            document.getElementById('f-tgl').value = (item.tanggal || item.tgl || '').split('T')[0];
+            document.getElementById('f-jam').value = item.jam || '';
+            document.getElementById('f-kelas').value = item.kelas || '';
+            document.getElementById('f-mapel').value = item.mata_pelajaran || item.mapel || '';
+            document.getElementById('f-metode').value = item.metode || '';
+            document.getElementById('f-asesmen').value = item.asesmen || '';
+            document.getElementById('f-materi').value = item.materi || '';
+            document.getElementById('f-tujuan').value = item.tujuan || '';
+
+            // Load Siswa Absensi untuk kelas tersebut
+            loadSiswaAgenda();
+
+            // Scroll to Top Form
+            document.getElementById('form-agenda-box').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEditAgenda() {
+            editingRowId = null;
+            document.getElementById('editing-banner').classList.add('hidden');
+            document.getElementById('btn-submit-text').innerText = "SIMPAN JURNAL & PRESENSI SEKALIGUS";
+            document.getElementById('f-materi').value = "";
+            document.getElementById('f-tujuan').value = "";
+        }
+
+        // DELETE RECORD
         async function delRec(id) {
             if(!confirm("Hapus Permanen? Data yang sudah dihapus tidak dapat dipulihkan.")) return;
             document.getElementById('loading').style.display = 'flex';
@@ -708,7 +793,7 @@
             }
         }
 
-        // --- SISTEM PENUNJANG ---
+        // --- SISTEM PENUNJANG NILAI ---
         function loadSiswaNilai() {
             const kls = document.getElementById('n-kelas').value;
             const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
@@ -780,94 +865,32 @@
             }
         }
 
-        function renderSiswa() {
-            const kls = document.getElementById('abs-kelas').value;
-            const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
+        function getAbsensiSummary(tgl, kelas) {
+            if (!tgl || !kelas) return '-';
             
-            document.getElementById('siswa-list').innerHTML = s.map(i => {
-                const namaSiswa = i.nama_siswa || i.siswa || '';
-                return `
-                <div class="flex justify-between items-center p-5 bg-white/70 border border-slate-100 rounded-2xl shadow-sm transition-all hover:border-indigo-200">
-                    <span class="font-bold text-slate-800">${namaSiswa}</span>
-                    <select class="abs-val p-3 border border-slate-200 rounded-xl outline-none font-bold text-xs bg-slate-50 cursor-pointer" data-siswa="${namaSiswa}">
-                        <option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option>
-                    </select>
-                </div>`;
-            }).join('');
-            document.getElementById('btn-save-abs').classList.remove('hidden');
-        }
+            const formattedTgl = String(tgl).split('T')[0];
+            const records = DB.records.filter(x => {
+                const recTgl = String(x.tanggal || x.tgl || '').split('T')[0];
+                const recKelas = String(x.kelas || '');
+                return x.tipe === 'absensi' && recTgl === formattedTgl && recKelas === kelas;
+            });
 
-        async function saveAbsensi() {
-            const tgl = document.getElementById('abs-tgl').value;
-            const kls = document.getElementById('abs-kelas').value;
-            
-            if(!tgl) return alert("Pilih Tanggal Absensi!");
-            
-            document.getElementById('loading').style.display = 'flex';
-            
-            let batchData = [];
-            for(let v of document.querySelectorAll('.abs-val')) {
-                batchData.push({ 
-                    tipe: 'absensi', 
-                    tgl: tgl, 
-                    kelas: kls, 
-                    siswa: v.dataset.siswa, 
-                    status: v.value, 
-                    guru: curUser.user 
-                });
-            }
+            if (records.length === 0) return '-';
 
-            try {
-                await fetch(API, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: 'create_batch', data: batchData })
-                });
+            let h = 0, s = 0, i = 0, a = 0;
+            records.forEach(r => {
+                const statusVal = String(
+                    r.status || r.Status || r.status_absensi || r['Status Absensi'] || r['STATUS'] || ''
+                ).toLowerCase().trim();
                 
-                alert("Presensi Selesai diarsipkan.");
-                await refreshTransactionData(); 
-            } catch (error) {
-                alert("Gagal menyimpan absensi: " + error);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
+                if (statusVal.includes('hadir') || statusVal === 'h') h++;
+                else if (statusVal.includes('sakit') || statusVal === 's') s++;
+                else if (statusVal.includes('izin') || statusVal === 'i') i++;
+                else if (statusVal.includes('alpha') || statusVal.includes('alpa') || statusVal === 'a') a++;
+            });
+
+            return `H:${h} S:${s} I:${i} A:${a}`;
         }
-
-       function getAbsensiSummary(tgl, kelas) {
-    if (!tgl || !kelas) return '-';
-    
-    // Normalisasi format tanggal (YYYY-MM-DD)
-    const formattedTgl = String(tgl).split('T')[0];
-    
-    // Filter data absensi berdasarkan tanggal dan kelas
-    const records = DB.records.filter(x => {
-        const recTgl = String(x.tanggal || x.tgl || '').split('T')[0];
-        const recKelas = String(x.kelas || '');
-        return x.tipe === 'absensi' && recTgl === formattedTgl && recKelas === kelas;
-    });
-
-    // Jika tidak ada data absensi sama sekali pada tanggal & kelas tersebut
-    if (records.length === 0) return '-';
-
-    let h = 0, s = 0, i = 0, a = 0;
-    records.forEach(r => {
-        // Pengecekan mulus untuk berbagai variasi nama kolom header
-        const statusVal = String(
-            r.status || r.Status || r.status_absensi || r['Status Absensi'] || r['STATUS'] || ''
-        ).toLowerCase().trim();
-        
-        if (statusVal.includes('hadir') || statusVal === 'h') {
-            h++;
-        } else if (statusVal.includes('sakit') || statusVal === 's') {
-            s++;
-        } else if (statusVal.includes('izin') || statusVal === 'i') {
-            i++;
-        } else if (statusVal.includes('alpha') || statusVal.includes('alpa') || statusVal === 'a') {
-            a++;
-        }
-    });
-
-    return `H:${h} S:${s} I:${i} A:${a}`;
-}
 
         function generatePrintReport() {
             const printType = document.getElementById('print-type').value;
