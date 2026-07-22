@@ -832,21 +832,42 @@
             }
         }
 
-        function getAbsensiSummary(tgl, kelas) {
-            if (!tgl || !kelas) return '-';
-            const formattedTgl = tgl.split('T')[0];
-            const records = DB.records.filter(x => x.tipe === 'absensi' && (x.tanggal || x.tgl || '').split('T')[0] === formattedTgl && x.kelas === kelas);
-            if (records.length === 0) return '-';
-            let h = 0, s = 0, i = 0, a = 0;
-            records.forEach(r => {
-                const st = (r.status || '').toLowerCase();
-                if (st === 'hadir') h++;
-                else if (st === 'sakit') s++;
-                else if (st === 'izin') i++;
-                else if (st === 'alpha') a++;
-            });
-            return `H:${h} S:${s} I:${i} A:${a}`;
+       function getAbsensiSummary(tgl, kelas) {
+    if (!tgl || !kelas) return '-';
+    
+    // Normalisasi format tanggal (YYYY-MM-DD)
+    const formattedTgl = String(tgl).split('T')[0];
+    
+    // Filter data absensi berdasarkan tanggal dan kelas
+    const records = DB.records.filter(x => {
+        const recTgl = String(x.tanggal || x.tgl || '').split('T')[0];
+        const recKelas = String(x.kelas || '');
+        return x.tipe === 'absensi' && recTgl === formattedTgl && recKelas === kelas;
+    });
+
+    // Jika tidak ada data absensi sama sekali pada tanggal & kelas tersebut
+    if (records.length === 0) return '-';
+
+    let h = 0, s = 0, i = 0, a = 0;
+    records.forEach(r => {
+        // Pengecekan mulus untuk berbagai variasi nama kolom header
+        const statusVal = String(
+            r.status || r.Status || r.status_absensi || r['Status Absensi'] || r['STATUS'] || ''
+        ).toLowerCase().trim();
+        
+        if (statusVal.includes('hadir') || statusVal === 'h') {
+            h++;
+        } else if (statusVal.includes('sakit') || statusVal === 's') {
+            s++;
+        } else if (statusVal.includes('izin') || statusVal === 'i') {
+            i++;
+        } else if (statusVal.includes('alpha') || statusVal.includes('alpa') || statusVal === 'a') {
+            a++;
         }
+    });
+
+    return `H:${h} S:${s} I:${i} A:${a}`;
+}
 
         function generatePrintReport() {
             const printType = document.getElementById('print-type').value;
