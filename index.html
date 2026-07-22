@@ -116,7 +116,7 @@
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <!-- LUXURY SIDEBAR / RESPONSIVE BOTTOM NAV FOR MOBILE -->
+            <!-- LUXURY SIDEBAR -->
             <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-lg border-t border-slate-200/50 px-2 py-1 flex flex-row justify-around items-center z-50 md:static md:h-auto md:w-20 lg:w-72 md:bg-white/50 md:border-t-0 md:border-r md:p-4 md:flex-col md:justify-start md:gap-3 overflow-y-auto custom-scroll">
                 <button onclick="setPanel('agenda')" class="nav-item active group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-white/20 group-hover:bg-white/40 transition-colors"><i data-lucide="layout-grid" class="w-5 h-5"></i></div>
@@ -151,7 +151,8 @@
                             <p class="text-slate-400 text-sm sm:text-base font-medium">Rekam aktivitas pembelajaran hari ini</p>
                         </div>
                         <div class="flex gap-2 self-end sm:self-auto">
-                            <button onclick="initData()" class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200 text-indigo-600 hover:bg-indigo-50 transition-all"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+                            <!-- Update refresh memanggil refreshTransactionData saja -->
+                            <button onclick="refreshTransactionData()" class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200 text-indigo-600 hover:bg-indigo-50 transition-all"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
                         </div>
                     </div>
 
@@ -384,7 +385,7 @@
 
     <script>
         // --- CORE CONFIG ---
-        const API = "https://script.google.com/macros/s/AKfycbzuXpSFxgduutNzIFQe3LxjZwHDzi4x-EzL7qA_wa6Vxk5uxsDdThiYBZOefyydasAG-w/exec"; 
+        const API = "https://script.google.com/macros/s/AKfycby1qUkwyDOMWTGPCTxweCDYvWRZHokK5rBQgMJ0UFW9W3w_08rJOZiHcnoUq056C02Tbg/exec"; 
         let DB = { guru:[], kelas:[], mapel:[], siswa:[], records:[] }, curUser = {}, canvas, ctx, drawing = false, photo = "";
 
         // --- INIT APP ---
@@ -398,6 +399,21 @@
                 document.getElementById('loading').style.display = 'none';
                 updateTime();
             } catch (e) { alert("Sistem Gagal Sinkronisasi! Cek Koneksi."); }
+        }
+
+        // FUNGSI BARU: Refresh hanya sheet Data
+        async function refreshTransactionData() {
+            document.getElementById('loading').style.display = 'flex';
+            try {
+                let res = await fetch(API + "?action=get_sheet&sheetName=Data");
+                let newData = await res.json();
+                DB.records = newData; 
+                renderAll(); 
+            } catch (error) {
+                console.error("Gagal me-refresh data:", error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
 
         function updateTime() {
@@ -460,12 +476,19 @@
             } catch (e) { alert("Akses Kamera Ditolak!"); }
         }
 
+        // FUNGSI UPDATE: Resize canvas dan kompresi kualitas JPEG
         function takePhoto() {
             const v = document.getElementById('video');
             const c = document.createElement('canvas');
-            c.width = 800; c.height = 600;
-            c.getContext('2d').drawImage(v, 0, 0, 800, 600);
-            photo = c.toDataURL('image/jpeg', 0.7);
+            
+            // Resolusi dikurangi untuk kompresi payload
+            c.width = 640; 
+            c.height = 480;
+            c.getContext('2d').drawImage(v, 0, 0, 640, 480);
+            
+            // Kualitas kompresi 50%
+            photo = c.toDataURL('image/jpeg', 0.5); 
+            
             document.getElementById('photo-pre').src = photo;
             document.getElementById('cam-box').classList.add('hidden');
             document.getElementById('pre-box').classList.remove('hidden');
@@ -584,7 +607,13 @@
             const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data:d })});
             if(await res.text() === "OK") {
                 alert("Berhasil: Data Jurnal telah diarsipkan ke Cloud.");
-                location.reload();
+                
+                // Gunakan refresh partial
+                document.getElementById('f-materi').value = "";
+                document.getElementById('f-tujuan').value = "";
+                resetCam();
+                clearCanvas();
+                await refreshTransactionData();
             }
         }
 
@@ -594,14 +623,18 @@
             document.getElementById('loading').style.display = 'flex';
             await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data:d })});
             alert("Berhasil: Skor Nilai telah disimpan.");
-            initData();
+            
+            // Ganti initData dengan refresh partial
+            await refreshTransactionData();
         }
 
         async function delRec(id) {
             if(!confirm("Hapus Permanen? Data yang sudah dihapus tidak dapat dipulihkan.")) return;
             document.getElementById('loading').style.display = 'flex';
             await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'delete', rowId: id })});
-            initData();
+            
+            // Ganti initData dengan refresh partial
+            await refreshTransactionData();
         }
 
         // --- SISTEM PENUNJANG ---
@@ -625,16 +658,40 @@
             document.getElementById('btn-save-abs').classList.remove('hidden');
         }
 
+        // FUNGSI UPDATE: Menyimpan presensi dengan sistem Batch Request (Hanya 1x Call)
         async function saveAbsensi() {
             const tgl = document.getElementById('abs-tgl').value;
             const kls = document.getElementById('abs-kelas').value;
+            
             if(!tgl) return alert("Pilih Tanggal Absensi!");
+            
             document.getElementById('loading').style.display = 'flex';
+            
+            let batchData = [];
             for(let v of document.querySelectorAll('.abs-val')) {
-                await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data: { tipe:'absensi', tgl, kelas:kls, siswa:v.dataset.siswa, status:v.value, guru:curUser.user }})});
+                batchData.push({ 
+                    tipe: 'absensi', 
+                    tgl: tgl, 
+                    kelas: kls, 
+                    siswa: v.dataset.siswa, 
+                    status: v.value, 
+                    guru: curUser.user 
+                });
             }
-            alert("Presensi Selesai diarsipkan.");
-            initData();
+
+            try {
+                await fetch(API, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'create_batch', data: batchData })
+                });
+                
+                alert("Presensi Selesai diarsipkan.");
+                await refreshTransactionData(); 
+            } catch (error) {
+                alert("Gagal menyimpan absensi: " + error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
 
         // --- DINAMISASI FITUR CETAK (GURU & KELAS) ---
