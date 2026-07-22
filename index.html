@@ -48,7 +48,7 @@
 </head>
 <body class="min-h-screen overflow-x-hidden md:overflow-hidden">
 
-    <!-- ELEGANT LOADER -->
+    <!-- LOADER -->
     <div id="loading" class="fixed inset-0 bg-slate-900 z-[99] flex flex-col items-center justify-center text-white">
         <div class="relative w-24 h-24">
             <div class="absolute inset-0 border-4 border-indigo-500/20 rounded-full"></div>
@@ -58,7 +58,7 @@
         <p class="mt-6 font-medium tracking-[0.2em] text-indigo-300 text-sm animate-pulse">SMK CLOUD SYSTEM</p>
     </div>
 
-    <!-- MODERN LOGIN -->
+    <!-- LOGIN -->
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4 bg-slate-50">
         <div class="bg-white/80 backdrop-blur-xl p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white relative overflow-hidden">
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
@@ -121,7 +121,7 @@
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <!-- LUXURY SIDEBAR -->
+            <!-- SIDEBAR -->
             <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-lg border-t border-slate-200/50 px-2 py-1 flex flex-row justify-around items-center z-50 md:static md:h-auto md:w-20 lg:w-72 md:bg-white/50 md:border-t-0 md:border-r md:p-4 md:flex-col md:justify-start md:gap-3 overflow-y-auto custom-scroll">
                 <button onclick="setPanel('agenda', this)" class="nav-item active group flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-4 p-2 lg:p-4 rounded-xl lg:rounded-2xl font-semibold transition-all w-full max-w-[80px] md:max-w-none text-center lg:text-left">
                     <div class="p-2 rounded-lg bg-white/20 group-hover:bg-white/40 transition-colors"><i data-lucide="layout-grid" class="w-5 h-5"></i></div>
@@ -143,7 +143,7 @@
             <!-- MAIN VIEWPORT -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 pb-28 md:pb-10 custom-scroll relative w-full">
                 
-                <!-- PANEL: AGENDA & PRESENSI INTEGRATED -->
+                <!-- PANEL: AGENDA & PRESENSI -->
                 <div id="p-agenda" class="panel active space-y-6 sm:space-y-8 max-w-6xl mx-auto">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
@@ -212,7 +212,7 @@
                                 </div>
                             </div>
 
-                            <!-- DILAKUKAN PERUBAHAN PADA KONTAINER SISWA (TANPA SCROLL, KELUAR SEMUA) -->
+                            <!-- KONTAINER SISWA (LANGSUNG TAMPIL SEMUA, TANPA SCROLL) -->
                             <div class="md:col-span-2 lg:col-span-3 space-y-2">
                                 <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Presensi Siswa Kelas</label>
                                 <div id="agenda-siswa-list" class="bg-white/50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -316,27 +316,35 @@
                     </div>
                 </div>
 
-                <!-- PANEL: REKAP -->
+                <!-- PANEL: REKAP & CETAK -->
                 <div id="p-rekap" class="panel space-y-6 sm:space-y-8">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Monitoring Dashboard</h3>
-                            <p class="text-slate-400 font-medium text-sm sm:text-base">Ringkasan data dan pelaporan sistem</p>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Monitoring & Cetak Agenda</h3>
+                            <p class="text-slate-400 font-medium text-sm sm:text-base">Pilih opsi format cetak laporan agenda harian guru atau agenda kelas</p>
                         </div>
                         
+                        <!-- DUA PILIHAN CETAK DAN FILTER DIKEMBANGKAN -->
                         <div class="flex flex-wrap items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200/60 shadow-sm w-full lg:w-auto">
-                            <div class="flex flex-col min-w-[140px] flex-1 sm:flex-initial">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tipe Cetak</span>
+                            <div class="flex flex-col min-w-[150px] flex-1 sm:flex-initial">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tipe Dokumen Cetak</span>
                                 <select id="print-type" onchange="generatePrintReport()" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none cursor-pointer">
-                                    <option value="guru">Agenda Harian Guru</option>
-                                    <option value="kelas">Agenda Kelas</option>
+                                    <option value="guru">1. Agenda Harian Guru</option>
+                                    <option value="kelas">2. Agenda Kelas</option>
                                 </select>
                             </div>
-                            <div id="print-kelas-container" class="flex flex-col min-w-[120px] flex-1 sm:flex-initial hidden">
+
+                            <div id="print-kelas-container" class="flex flex-col min-w-[130px] flex-1 sm:flex-initial hidden">
                                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Kelas</span>
                                 <select id="print-kelas" onchange="generatePrintReport()" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none cursor-pointer"></select>
                             </div>
-                            <button onclick="window.print()" class="flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-indigo-600 transition-all h-[38px] self-end flex-1 sm:flex-initial">
+
+                            <div class="flex flex-col min-w-[130px] flex-1 sm:flex-initial">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filter Bulan</span>
+                                <input type="month" id="print-month" onchange="generatePrintReport()" class="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none">
+                            </div>
+
+                            <button onclick="window.print()" class="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs transition-all h-[38px] self-end flex-1 sm:flex-initial shadow-lg shadow-indigo-100">
                                 <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan
                             </button>
                         </div>
@@ -366,14 +374,14 @@
         </div>
     </div>
 
-    <!-- PRINT SECTION -->
+    <!-- AREA CETAK LAPORAN (PRINT LAYOUT DUA MODE) -->
     <div class="print-only p-8 bg-white">
         <div id="print-header" class="flex items-center justify-between border-b-4 border-slate-900 pb-4 mb-6">
             <div class="flex items-center gap-4">
                 <img class="w-16 h-16 object-contain" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgz1tbb8TSawO2lHGi_GXN3Il5CtrN_K125hSy7D8NxvBFL6bywiebvkalj_6oRIBVxEm_zj84j6ZAlhKmaEOqjIeGHXe9SWw0HQipKs3aL8iy7K1Dc_Pd9SHMVZsOQrb99qTK78Wmee7StIKKzzfST5YU_CkGSAz3MuMJsrSL_nHt37c5AzIe8B7HodnQ/s320/LOGO%20SMKN%20BOJONGGAMBIR.png">
                 <div>
                     <h1 class="text-2xl font-black uppercase tracking-tighter">SMKN BOJONGGAMBIR</h1>
-                    <p class="text-xs font-bold text-slate-500">LAPORAN KINERJA GURU - DASHBOARD CLOUD SYSTEM</p>
+                    <p class="text-xs font-bold text-slate-500">SISTEM MONITORING & DOKUMENTASI AGENDA PEMBELAJARAN</p>
                 </div>
             </div>
             <div class="text-right">
@@ -384,12 +392,12 @@
     </div>
 
     <script>
-        // --- CORE CONFIG ---
+        // --- CONFIG & GLOBAL VARS ---
         const API = "https://script.google.com/macros/s/AKfycbxt8rwOiASudNeayuW4hK3qk66Bp5uR6LyogLv1n_IUb-styCzOb4ZWSANLXEmTezFuhg/exec"; 
         let DB = { guru:[], kelas:[], mapel:[], siswa:[], records:[] }, curUser = {}, canvas, ctx, drawing = false, photo = "";
         let editingRowId = null;
 
-        // --- INIT APP ---
+        // --- INIT DATA ---
         async function initData() {
             document.getElementById('loading').style.display = 'flex';
             try {
@@ -426,6 +434,11 @@
             document.getElementById('display-date').innerText = dateStr;
             document.getElementById('display-time').innerText = timeStr;
             document.getElementById('p-date').innerText = "Tanggal Cetak: " + dateStr;
+            
+            // Set default print-month input to current month
+            const yearMonth = now.toISOString().slice(0, 7);
+            const mElem = document.getElementById('print-month');
+            if(mElem && !mElem.value) mElem.value = yearMonth;
         }
 
         function fillDropdowns() {
@@ -488,7 +501,7 @@
             }
         }
 
-        // --- KAMERA & TTD OPTIMIZED ---
+        // --- KAMERA & TTD ---
         async function initCam() {
             try {
                 const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -555,7 +568,7 @@
             return tempCanvas.toDataURL('image/jpeg', 0.5);
         }
 
-        // --- LOAD SISWA DI FORM AGENDA (LANGSUNG TAMPIL SEMUA SISWA) ---
+        // --- LOAD SISWA DI FORM AGENDA (OTOMATIS TANPA SCROLL) ---
         function loadSiswaAgenda() {
             const kls = document.getElementById('f-kelas').value;
             const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
@@ -578,7 +591,7 @@
             }).join('');
         }
 
-        // --- LOGIC RENDER ---
+        // --- RENDER DASHBOARD ---
         function renderAll() {
             renderAgenda();
             renderNilai();
@@ -670,7 +683,7 @@
             lucide.createIcons();
         }
 
-        // --- CRUD ACTIONS (INTEGRATED SATU KALI SIMPAN) ---
+        // --- SAVE AGENDA & PRESENSI INTEGRATED ---
         async function saveAgendaIntegrated() {
             const ttdData = getCompressedTTD();
             const d = { 
@@ -690,7 +703,6 @@
 
             if(!d.tgl) return alert("Peringatan: Tanggal harus diisi!");
 
-            // Ambil data presensi jika ada
             let absData = [];
             document.querySelectorAll('.agenda-abs-val').forEach(el => {
                 absData.push({
@@ -705,7 +717,6 @@
 
             document.getElementById('loading').style.display = 'flex';
             try {
-                // Jika sedang Mode Edit (UPDATE)
                 if (editingRowId) {
                     await fetch(API, {
                         method: 'POST',
@@ -714,13 +725,11 @@
                     alert("Berhasil: Jurnal Pembelajaran berhasil diperbarui!");
                     cancelEditAgenda();
                 } else {
-                    // Mode Tambah Baru (CREATE INTEGRATED)
                     await fetch(API, { 
                         method: 'POST', 
                         body: JSON.stringify({ action: 'create', data: d })
                     });
 
-                    // Simpan data Absensi secara otomatis sekaligus
                     if (absData.length > 0) {
                         await fetch(API, {
                             method: 'POST',
@@ -730,7 +739,6 @@
                     alert("Berhasil: Jurnal Pembelajaran & Presensi Siswa tersimpan dalam 1 kali simpan!");
                 }
 
-                // Reset Form
                 document.getElementById('f-materi').value = "";
                 document.getElementById('f-tujuan').value = "";
                 resetCam();
@@ -745,7 +753,6 @@
             }
         }
 
-        // EDIT RECORD (AGENDA UPDATE)
         function editAgenda(rowId) {
             const item = DB.records.find(x => x.rowId === rowId);
             if (!item) return alert("Data tidak ditemukan!");
@@ -755,7 +762,6 @@
             document.getElementById('editing-id').innerText = rowId;
             document.getElementById('btn-submit-text').innerText = "UPDATE DATA JURNAL";
 
-            // Populate Form Fields
             document.getElementById('f-tgl').value = (item.tanggal || item.tgl || '').split('T')[0];
             document.getElementById('f-jam').value = item.jam || '';
             document.getElementById('f-kelas').value = item.kelas || '';
@@ -765,10 +771,7 @@
             document.getElementById('f-materi').value = item.materi || '';
             document.getElementById('f-tujuan').value = item.tujuan || '';
 
-            // Load Siswa Absensi untuk kelas tersebut
             loadSiswaAgenda();
-
-            // Scroll to Top Form
             document.getElementById('form-agenda-box').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -780,7 +783,6 @@
             document.getElementById('f-tujuan').value = "";
         }
 
-        // DELETE RECORD
         async function delRec(id) {
             if(!confirm("Hapus Permanen? Data yang sudah dihapus tidak dapat dipulihkan.")) return;
             document.getElementById('loading').style.display = 'flex';
@@ -794,7 +796,7 @@
             }
         }
 
-        // --- SISTEM PENUNJANG NILAI ---
+        // --- SISTEM E-NILAI ---
         function loadSiswaNilai() {
             const kls = document.getElementById('n-kelas').value;
             const s = DB.siswa ? DB.siswa.filter(x => (x.kelas || x.nama_kelas) === kls) : [];
@@ -866,6 +868,7 @@
             }
         }
 
+        // --- HELPER UNTUK REKAP ABSENSI ---
         function getAbsensiSummary(tgl, kelas) {
             if (!tgl || !kelas) return '-';
             
@@ -893,10 +896,12 @@
             return `H:${h} S:${s} I:${i} A:${a}`;
         }
 
+        // --- SISTEM CETAK BARU (CETAK AGENDA GURU & CETAK AGENDA KELAS) ---
         function generatePrintReport() {
             const printType = document.getElementById('print-type').value;
             const printKelasContainer = document.getElementById('print-kelas-container');
             const selectedKelas = document.getElementById('print-kelas').value;
+            const monthFilter = document.getElementById('print-month') ? document.getElementById('print-month').value : '';
 
             if (printType === 'kelas') {
                 printKelasContainer.classList.remove('hidden');
@@ -906,8 +911,19 @@
 
             let filteredAgenda = DB.records.filter(x => x.tipe === 'agenda');
             
+            // Filter Berdasarkan Bulan jika dipilih
+            if (monthFilter) {
+                filteredAgenda = filteredAgenda.filter(x => {
+                    const t = (x.tanggal || x.tgl || '').split('T')[0];
+                    return t.startsWith(monthFilter);
+                });
+            }
+
+            // Filter Berdasarkan Mode Cetak
             if (printType === 'guru') {
-                filteredAgenda = filteredAgenda.filter(x => (x.nama_guru || x.guru) === curUser.user);
+                if (curUser.level === 'Guru') {
+                    filteredAgenda = filteredAgenda.filter(x => (x.nama_guru || x.guru) === curUser.user);
+                }
             } else if (printType === 'kelas' && selectedKelas) {
                 filteredAgenda = filteredAgenda.filter(x => x.kelas === selectedKelas);
             }
@@ -925,111 +941,112 @@
                 return rows;
             };
 
+            // RENDER ITEM TABEL CETAK AGENDA HARIAN GURU
             const renderGuruRows = () => {
                 let rows = '';
                 filteredAgenda.forEach((item, i) => {
                     const tgl = (item.tanggal || item.tgl || '').split('T')[0];
-                    const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 25px; margin: auto;">` : '';
+                    const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 28px; margin: auto;">` : '';
                     const kehadiranStr = getAbsensiSummary(tgl, item.kelas);
 
                     rows += `
                     <tr>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${i + 1}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${tgl}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.jam || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.kelas || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || item.mapel || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: left;"><b>${item.materi || '-'}</b><br><span style="font-size:8pt;">${item.tujuan || ''}</span></td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center; font-size:8pt;">${kehadiranStr}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.metode || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.asesmen || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle;">${ttdImg}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${i + 1}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${tgl}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${item.jam || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center; font-weight: bold;">${item.kelas || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px;">${item.mata_pelajaran || item.mapel || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: left;"><b>${item.materi || '-'}</b><br><span style="font-size:8pt; color: #475569;">${item.tujuan || ''}</span></td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center; font-size:8.5pt; font-weight: bold;">${kehadiranStr}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${item.metode || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${item.asesmen || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">${ttdImg}</td>
                     </tr>`;
                 });
                 
-                if (filteredAgenda.length < 10) {
-                    rows += generateEmptyRows(10 - filteredAgenda.length, 10, 36, filteredAgenda.length + 1);
+                if (filteredAgenda.length < 8) {
+                    rows += generateEmptyRows(8 - filteredAgenda.length, 10, 38, filteredAgenda.length + 1);
                 }
                 return rows;
             };
 
+            // RENDER ITEM TABEL CETAK AGENDA KELAS
             const renderKelasRows = () => {
                 let rows = '';
                 filteredAgenda.forEach((item, i) => {
                     const tgl = (item.tanggal || item.tgl || '').split('T')[0];
-                    const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 25px; margin: auto;">` : '';
+                    const ttdImg = item.ttd ? `<img src="${item.ttd}" style="max-height: 28px; margin: auto;">` : '';
                     const kehadiranStr = getAbsensiSummary(tgl, item.kelas);
 
                     rows += `
                     <tr>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${i + 1}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${tgl}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center;">${item.jam || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${item.mata_pelajaran || item.mapel || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${item.nama_guru || item.guru || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: left;">${item.materi || '-'}</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center; font-size:8pt;">${kehadiranStr}</td>
-                        <td style="border: 1px solid black; padding: 4px;">-</td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle;">${ttdImg}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${i + 1}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${tgl}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${item.jam || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; font-weight: bold;">${item.mata_pelajaran || item.mapel || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px;">${item.nama_guru || item.guru || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: left;"><b>${item.materi || '-'}</b></td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center; font-size:8.5pt; font-weight: bold;">${kehadiranStr}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center;">${item.metode || item.asesmen || '-'}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">${ttdImg}</td>
                     </tr>`;
                 });
 
-                if (filteredAgenda.length < 12) {
-                    rows += generateEmptyRows(12 - filteredAgenda.length, 9, 34, filteredAgenda.length + 1);
+                if (filteredAgenda.length < 10) {
+                    rows += generateEmptyRows(10 - filteredAgenda.length, 9, 36, filteredAgenda.length + 1);
                 }
                 return rows;
             };
 
+            // LAYOUT UTAMA DOKUMEN CETAK
             let html = `
-            <div style="font-family: 'Times New Roman', Calibri, serif; color: black; max-width: 100%; margin: 0 auto; line-height: 1.3;">
+            <div style="font-family: 'Times New Roman', Times, serif; color: black; max-width: 100%; margin: 0 auto; line-height: 1.3;">
                 <style>
                     .print-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; text-align: center; margin-bottom: 12px; }
-                    .print-table th { background-color: #f3f4f6 !important; font-weight: bold; border: 1px solid black; padding: 6px 2px; }
-                    .print-table td { border: 1px solid black; padding: 4px; }
-                    .header-title { text-align: center; font-size: 15pt; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
-                    .sub-heading { font-weight: bold; font-size: 11pt; margin-bottom: 5px; margin-top: 10px;}
-                    .identity-table { width: 100%; font-size: 10.5pt; margin-bottom: 12px; border: none; text-align: left; }
-                    .identity-table td { padding-bottom: 3px; border: none; }
-                    .signature-table { width: 100%; font-size: 10.5pt; text-align: center; margin-top: 15px; border: none; }
+                    .print-table th { background-color: #f1f5f9 !important; font-weight: bold; border: 1px solid black; padding: 6px 2px; text-transform: uppercase; }
+                    .print-table td { border: 1px solid black; padding: 5px; }
+                    .header-title { text-align: center; font-size: 15pt; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+                    .identity-table { width: 100%; font-size: 10.5pt; margin-bottom: 14px; border: none; text-align: left; }
+                    .identity-table td { padding-bottom: 4px; border: none; }
+                    .signature-table { width: 100%; font-size: 10pt; text-align: center; margin-top: 25px; border: none; }
                     .signature-table td { width: 33.33%; vertical-align: top; border: none; }
                 </style>`;
 
             if (printType === 'guru') {
                 html += `
                 <div>
-                    <div class="header-title">AGENDA HARIAN GURU SMK</div>
+                    <div class="header-title">AGENDA HARIAN PEMBELAJARAN GURU</div>
                     
                     <table class="identity-table">
-                        <tr><td style="width: 140px;">Nama Guru</td><td style="width: 15px;">:</td><td><b>${curUser.user || '________________________________________'}</b></td></tr>
-                        <tr><td>NIP/NUPTK</td><td>:</td><td>________________________________________</td></tr>
-                        <tr><td>Semester/Tahun</td><td>:</td><td>________________________________________</td></tr>
+                        <tr>
+                            <td style="width: 140px; font-weight: bold;">Nama Guru</td><td style="width: 15px;">:</td><td style="width: 45%;"><b>${curUser.user || '________________________________________'}</b></td>
+                            <td style="width: 120px; font-weight: bold;">Bulan/Periode</td><td style="width: 15px;">:</td><td><b>${monthFilter || '______________________________'}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">NIP/NUPTK</td><td>:</td><td>________________________________________</td>
+                            <td style="font-weight: bold;">Satuan Pendidikan</td><td>:</td><td>SMKN BOJONGGAMBIR</td>
+                        </tr>
                     </table>
 
                     <table class="print-table">
                         <thead>
                             <tr>
                                 <th style="width: 3%;">No</th>
-                                <th style="width: 11%;">Hari/Tanggal</th>
-                                <th style="width: 5%;">Jam<br>Ke</th>
-                                <th style="width: 7%;">Kelas</th>
-                                <th style="width: 15%;">Mata Pelajaran</th>
-                                <th style="width: 26%;">Materi / Tujuan Pembelajaran</th>
-                                <th style="width: 9%;">Kehadiran<br>(H/S/I/A)</th>
-                                <th style="width: 9%;">Metode</th>
-                                <th style="width: 10%;">Penilaian</th>
-                                <th style="width: 5%;">Paraf<br>Guru</th>
+                                <th style="width: 10%;">Hari/Tgl</th>
+                                <th style="width: 5%;">Jam</th>
+                                <th style="width: 8%;">Kelas</th>
+                                <th style="width: 16%;">Mata Pelajaran</th>
+                                <th style="width: 25%;">Materi & Tujuan Pembelajaran</th>
+                                <th style="width: 10%;">Kehadiran<br>(H/S/I/A)</th>
+                                <th style="width: 8%;">Metode</th>
+                                <th style="width: 8%;">Asesmen</th>
+                                <th style="width: 7%;">Paraf</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${renderGuruRows()}
                         </tbody>
                     </table>
-
-                    <div style="font-size: 10pt; margin-bottom: 10px;">
-                        <div class="sub-heading">Catatan Harian Guru:</div>
-                        <div style="border-bottom: 1px dotted black; height: 18px; width: 100%;"></div>
-                        <div style="border-bottom: 1px dotted black; height: 18px; width: 100%;"></div>
-                    </div>
 
                     <table class="signature-table">
                         <tr>
@@ -1042,31 +1059,31 @@
             } else {
                 html += `
                 <div>
-                    <div class="header-title">AGENDA KELAS SMK</div>
+                    <div class="header-title">AGENDA KEGIATAN PEMBELAJARAN KELAS</div>
                     
                     <table class="identity-table">
                         <tr>
-                            <td style="width: 120px;">Nama Sekolah</td><td style="width: 15px;">:</td><td style="width: 45%;">SMKN BOJONGGAMBIR</td>
-                            <td style="width: 100px;">Wali Kelas</td><td style="width: 15px;">:</td><td>______________________________</td>
+                            <td style="width: 120px; font-weight: bold;">Satuan Pendidikan</td><td style="width: 15px;">:</td><td style="width: 45%;"><b>SMKN BOJONGGAMBIR</b></td>
+                            <td style="width: 100px; font-weight: bold;">Kelas</td><td style="width: 15px;">:</td><td><b>${selectedKelas || '______________________________'}</b></td>
                         </tr>
                         <tr>
-                            <td>Kelas</td><td>:</td><td><b>${selectedKelas || '________________________________________'}</b></td>
-                            <td>Semester</td><td>:</td><td>______________________________</td>
+                            <td style="font-weight: bold;">Wali Kelas</td><td>:</td><td>________________________________________</td>
+                            <td style="font-weight: bold;">Bulan/Periode</td><td>:</td><td><b>${monthFilter || '______________________________'}</b></td>
                         </tr>
                     </table>
 
                     <table class="print-table">
                         <thead>
                             <tr>
-                                <th style="width: 3%;">No</th>
+                                <th style="width: 4%;">No</th>
                                 <th style="width: 11%;">Hari/Tanggal</th>
-                                <th style="width: 5%;">Jam<br>Ke</th>
-                                <th style="width: 15%;">Mata Pelajaran</th>
-                                <th style="width: 15%;">Guru Pengajar</th>
-                                <th style="width: 27%;">Materi/Kegiatan Pembelajaran</th>
+                                <th style="width: 6%;">Jam Ke</th>
+                                <th style="width: 18%;">Mata Pelajaran</th>
+                                <th style="width: 18%;">Nama Guru Pengajar</th>
+                                <th style="width: 23%;">Materi / Kegiatan Pembelajaran</th>
                                 <th style="width: 9%;">Kehadiran<br>(H/S/I/A)</th>
-                                <th style="width: 10%;">Catatan Guru</th>
-                                <th style="width: 5%;">Paraf<br>Guru</th>
+                                <th style="width: 6%;">Ket</th>
+                                <th style="width: 5%;">Paraf</th>
                             </tr>
                         </thead>
                         <tbody>
