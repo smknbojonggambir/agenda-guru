@@ -599,16 +599,16 @@
             
             printType === 'kelas' ? printKelasContainer.classList.remove('hidden') : printKelasContainer.classList.add('hidden');
 
-            let filtered = getFilteredRecords().filter(x => x.tipe === 'agenda');
-            if (printType === 'kelas' && selectedKelas) filtered = filtered.filter(x => x.kelas === selectedKelas);
+            // --- TABEL AGENDA ---
+            let filteredAgenda = getFilteredRecords().filter(x => x.tipe === 'agenda');
+            if (printType === 'kelas' && selectedKelas) filteredAgenda = filteredAgenda.filter(x => x.kelas === selectedKelas);
 
-            // Logika render tabel dinamis sama seperti sebelumnya[cite: 2]
-            let rows = '';
-            filtered.forEach((item, i) => {
+            let rowsAgenda = '';
+            filteredAgenda.forEach((item, i) => {
                 const tgl = (item.tanggal || item.tgl || '').split('T')[0];
                 const img = item.ttd || item.tanda_tangan ? `<img src="${item.ttd || item.tanda_tangan}" height="30">` : '';
                 
-                rows += `
+                rowsAgenda += `
                 <tr>
                     <td style="border: 1px solid black; padding: 5px; text-align: center;">${i + 1}</td>
                     <td style="border: 1px solid black; padding: 5px; text-align: center;">${tgl}</td>
@@ -620,9 +620,80 @@
                 </tr>`;
             });
 
+            // --- TABEL KEHADIRAN (Hanya untuk Laporan Kelas) ---
+            let tabelKehadiran = '';
+            if (printType === 'kelas' && selectedKelas) {
+                // Ambil data absensi berdasarkan kelas yang dipilih
+                let filteredAbsensi = getFilteredRecords().filter(x => x.tipe === 'absensi' && x.kelas === selectedKelas);
+                
+                let rowsAbsensi = '';
+                if(filteredAbsensi.length === 0) {
+                     rowsAbsensi = '<tr><td colspan="3" style="text-align:center; padding:10px;">Tidak ada data ketidakhadiran direkam</td></tr>';
+                } else {
+                     filteredAbsensi.forEach((item, i) => {
+                         const tgl = (item.tanggal || item.tgl || '').split('T')[0];
+                         let tidakHadir = [];
+                         
+                         // Deteksi 1: Format per-siswa (jika record disimpan satu baris per siswa)
+                         if (item.status && item.status.toLowerCase() !== 'hadir') {
+                             tidakHadir.push(`<b>${item.nama_siswa || item.nama || 'Siswa'}</b> (${item.status})`);
+                         }
+                         
+                         // Deteksi 2: Format rekap koma (jika record disimpan dalam kolom terpisah)
+                         if (item.sakit && String(item.sakit).trim() !== '') tidakHadir.push(`Sakit: ${item.sakit}`);
+                         if (item.izin && String(item.izin).trim() !== '') tidakHadir.push(`Izin: ${item.izin}`);
+                         if (item.alfa && String(item.alfa).trim() !== '') tidakHadir.push(`Alfa: ${item.alfa}`);
+                         
+                         // Deteksi 3: Format Array/JSON (jika sistem Anda menyimpan absensi massal dalam satu field 'detail')
+                         try {
+                             if(item.detail) {
+                                 let parsed = JSON.parse(item.detail);
+                                 parsed.forEach(d => {
+                                     if(d.status && d.status.toLowerCase() !== 'hadir') {
+                                         tidakHadir.push(`<b>${d.nama}</b> (${d.status})`);
+                                     }
+                                 });
+                             }
+                         } catch(e) {}
+
+                         let keterangan = tidakHadir.length > 0 ? tidakHadir.join('<br>') : '';
+
+                         // Hanya tambahkan baris jika ada siswa yang tidak hadir pada hari tersebut
+                         if (keterangan !== '') {
+                             rowsAbsensi += `
+                             <tr>
+                                 <td style="border: 1px solid black; padding: 5px; text-align: center;">${i + 1}</td>
+                                 <td style="border: 1px solid black; padding: 5px; text-align: center;">${tgl}</td>
+                                 <td style="border: 1px solid black; padding: 5px;">${keterangan}</td>
+                             </tr>`;
+                         }
+                     });
+                     
+                     // Jika perulangan selesai tapi semua siswa ternyata hadir
+                     if(rowsAbsensi === '') rowsAbsensi = '<tr><td colspan="3" style="text-align:center; padding:10px;">Nihil (Semua siswa hadir pada rentang tanggal ini)</td></tr>';
+                }
+
+                // Render HTML Tabel Kehadiran
+                tabelKehadiran = `
+                <h4 style="text-align:left; font-size:12pt; margin-top: 30px; margin-bottom: 10px; text-transform:uppercase; color: #1e293b;">Rekap Siswa Tidak Hadir</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
+                    <thead style="background-color: #f3f4f6;">
+                        <tr>
+                            <th style="border: 1px solid black; padding: 8px; width: 5%;">No</th>
+                            <th style="border: 1px solid black; padding: 8px; width: 20%;">Tanggal</th>
+                            <th style="border: 1px solid black; padding: 8px; width: 75%;">Nama Siswa & Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsAbsensi}</tbody>
+                </table>
+                `;
+            }
+
+            // --- PENGGABUNGAN HTML UNTUK CETAK ---
             const html = `
             <div style="font-family: 'Times New Roman', serif; width: 100%;">
                 <h3 style="text-align:center; font-size:16pt; margin-bottom: 20px; text-transform:uppercase;">Laporan ${printType === 'guru' ? 'Agenda Guru' : 'Agenda Kelas'}</h3>
+                
                 <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
                     <thead style="background-color: #f3f4f6;">
                         <tr>
@@ -635,15 +706,19 @@
                             <th style="border: 1px solid black; padding: 8px; width: 10%;">TTD</th>
                         </tr>
                     </thead>
-                    <tbody>${rows || '<tr><td colspan="7" style="text-align:center; padding:10px;">Tidak ada data ditemukan</td></tr>'}</tbody>
+                    <tbody>${rowsAgenda || '<tr><td colspan="7" style="text-align:center; padding:10px;">Tidak ada data ditemukan</td></tr>'}</tbody>
                 </table>
-                <table style="width:100%; text-align:center; margin-top:30px; font-size:11pt; border:none;">
+
+                ${tabelKehadiran}
+
+                <table style="width:100%; text-align:center; margin-top:30px; font-size:11pt; border:none; page-break-inside: avoid;">
                     <tr>
                         <td style="border:none; width:50%;">Mengetahui,<br>Kepala Sekolah<br><br><br><br>(____________________)</td>
                         <td style="border:none; width:50%;"><br>Guru / Penanggung Jawab<br><br><br><br>(<b>${curUser.user || '____________________'}</b>)</td>
                     </tr>
                 </table>
             </div>`;
+            
             document.getElementById('print-content').innerHTML = html;
         }
 
