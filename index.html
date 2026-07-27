@@ -598,71 +598,65 @@
             if (printType === 'guru') {
                 // ==========================================
                 // FORMAT 1: LAPORAN JURNAL MENGAJAR GURU
-                // (Format Detail memanjang ke bawah per sesi)
+                // (Sudah diubah menjadi format Tabel seperti Agenda Kelas)
                 // ==========================================
+                let rowsAgenda = '';
                 filteredAgenda.forEach((item, i) => {
                     const tgl = (item.tanggal || item.tgl || '').split('T')[0];
-                    const timestampStr = item.timestamp || (tgl + ' 07:00:00');
-                    const imgTTD = item.ttd || item.tanda_tangan ? `<img src="${item.ttd || item.tanda_tangan}" height="60" style="margin: 10px 0;">` : '<br><br><br>';
-                    const linkBukti = item.link_bukti ? `<a href="${item.link_bukti}" target="_blank" style="color: blue; text-decoration: underline;">Link Bukti Tersedia</a>` : '-';
-                    const fotoBukti = item.foto_bukti || item.fotoUrl || item.foto ? `<img src="${item.foto_bukti || item.fotoUrl || item.foto}" height="120" style="border-radius: 8px; margin-top:5px; border: 1px solid #ccc;">` : '-';
+                    const jamStr = tgl + "<br><span style='font-size: 8pt; color: #64748b;'>(" + (item.timestamp ? item.timestamp.split(' ')[1] || '07:00:00' : '07:00:00') + ")</span>";
+                    const imgTTD = item.ttd || item.tanda_tangan ? `<img src="${item.ttd || item.tanda_tangan}" height="30">` : '-';
+                    const linkBukti = item.link_bukti ? `<a href="${item.link_bukti}" target="_blank" style="color: blue;">Link</a>` : '-';
 
-                    htmlContent += `
-                    <div style="font-family: 'Times New Roman', serif; width: 100%; page-break-inside: avoid; margin-bottom: 40px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: white;">
-                        <div style="text-align: center; border-bottom: 2px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px;">
-                            <strong style="font-size: 14pt; letter-spacing: 1px;">LAPORAN JURNAL MENGAJAR GURU</strong><br>
-                            <em style="font-size: 10pt; color: #475569;">Berdasarkan Tarikan Data Sistem</em>
-                        </div>
-                        
-                        <strong style="font-size: 11pt; color: #1e293b;">A. INFORMASI UMUM</strong>
-                        <ul style="list-style: none; padding-left: 10px; margin-top: 8px; margin-bottom: 15px; font-size: 10pt; line-height: 1.6;">
-                            <li><strong>Timestamp :</strong> ${timestampStr}</li>
-                            <li><strong>Tanggal :</strong> ${tgl || '-'}</li>
-                            <li><strong>Tipe :</strong> ${item.tipe || 'Jurnal'}</li>
-                            <li><strong>Nama Guru :</strong> ${item.nama_guru || item.guru || curUser.user || '-'}</li>
-                            <li><strong>Jam Ke :</strong> ${item.jam_ke || item.jam || '-'}</li>
-                            <li><strong>Kelas :</strong> ${item.kelas || '-'}</li>
-                            <li><strong>Mata Pelajaran :</strong> ${item.mata_pelajaran || item.mapel || '-'}</li>
-                        </ul>
-
-                        <strong style="font-size: 11pt; color: #1e293b;">B. PERENCANAAN & PELAKSANAAN</strong>
-                        <ul style="list-style: none; padding-left: 10px; margin-top: 8px; margin-bottom: 15px; font-size: 10pt; line-height: 1.6;">
-                            <li><strong>Tujuan :</strong> ${item.tujuan || '-'}</li>
-                            <li><strong>Materi :</strong> ${item.materi || '-'}</li>
-                            <li><strong>Metode :</strong> ${item.metode || '-'}</li>
-                            <li><strong>Kegiatan :</strong> ${item.kegiatan || '-'}</li>
-                            <li><strong>Asesmen :</strong> ${item.asesmen || '-'}</li>
-                        </ul>
-
-                        <strong style="font-size: 11pt; color: #1e293b;">C. DATA KEHADIRAN & EVALUASI</strong>
-                        <ul style="list-style: none; padding-left: 10px; margin-top: 8px; margin-bottom: 15px; font-size: 10pt; line-height: 1.6;">
-                            <li><strong>Nama Siswa :</strong> ${item.nama_siswa || '- (Nihil / Sesuai Absensi)'}</li>
-                            <li><strong>Status Hadir :</strong> ${item.status_hadir || 'Hadir'}</li>
-                            <li><strong>Nilai :</strong> ${item.nilai || '-'}</li>
-                        </ul>
-
-                        <strong style="font-size: 11pt; color: #1e293b;">D. DOKUMENTASI & PENGESAHAN</strong>
-                        <ul style="list-style: none; padding-left: 10px; margin-top: 8px; margin-bottom: 15px; font-size: 10pt; line-height: 1.6;">
-                            <li><strong>Catatan :</strong> ${item.catatan || item.cat || '-'}</li>
-                            <li><strong>Link Bukti :</strong> ${linkBukti}</li>
-                            <li><strong>Foto Bukti :</strong><br>${fotoBukti}</li>
-                        </ul>
-
-                        <table style="width:100%; text-align:right; margin-top:30px; font-size:11pt; border:none;">
-                            <tr>
-                                <td style="border:none; text-align: right;">
-                                    Tanda Tangan<br>
-                                    ${imgTTD}<br>
-                                    <b>${item.nama_guru || item.guru || curUser.user || '____________________'}</b>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>`;
+                    rowsAgenda += `
+                    <tr>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center;">${jamStr}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center;"><b>${item.kelas || '-'}</b><br><span style='font-size: 8pt;'>(Jam ${item.jam_ke || item.jam || '-'})</span></td>
+                        <td style="border: 1px solid #1e293b; padding: 6px;">${item.mata_pelajaran || item.mapel || '-'}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; font-size: 8pt;"><b>Tujuan:</b> ${item.tujuan || '-'}<br><b>Materi:</b> ${item.materi || '-'}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; font-size: 8pt;"><b>Metode:</b> ${item.metode || '-'}<br><b>Kegiatan:</b> ${item.kegiatan || '-'}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center;">${item.asesmen || '-'}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center; font-size: 8pt;">${item.nama_siswa || '-'}<br>(${item.status_hadir || 'Hadir'})</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center;">${item.nilai || '-'}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; font-size: 8pt;">${item.catatan || item.cat || '-'}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center;">${linkBukti}</td>
+                        <td style="border: 1px solid #1e293b; padding: 6px; text-align: center;">${imgTTD}</td>
+                    </tr>`;
                 });
-                
-                if (filteredAgenda.length === 0) {
-                    htmlContent = '<div style="text-align:center; padding:20px;">Tidak ada data Jurnal Guru untuk dicetak.</div>';
-                }
+
+                htmlContent = `
+                <div style="font-family: 'Times New Roman', serif; width: 100%;">
+                    <div style="text-align: center; border-bottom: 2px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px;">
+                        <strong style="font-size: 14pt; letter-spacing: 1px; text-transform:uppercase;">LAPORAN JURNAL MENGAJAR GURU</strong><br>
+                        <em style="font-size: 10pt; color: #475569;">Berdasarkan Tarikan Data Sistem</em>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+                        <thead style="background-color: #f1f5f9;">
+                            <tr>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Tanggal & Waktu</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Kelas & Jam</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Mata Pelajaran</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Tujuan & Materi</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Metode & Kegiatan</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Asesmen</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Siswa & Status</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Nilai</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Catatan Khusus</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">Bukti</th>
+                                <th style="border: 1px solid #1e293b; padding: 6px;">TTD</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsAgenda || '<tr><td colspan="11" style="text-align:center; padding:15px; font-style:italic;">Tidak ada data jurnal untuk dicetak pada rentang ini</td></tr>'}</tbody>
+                    </table>
+                    
+                    <table style="width:100%; text-align:center; margin-top:30px; font-size:11pt; border:none; page-break-inside: avoid;">
+                        <tr>
+                            <td style="border:none; width:50%;">Mengetahui,<br>Kepala Sekolah<br><br><br><br>(____________________)</td>
+                            <td style="border:none; width:50%;"><br>Guru Mata Pelajaran<br><br><br><br>(<b>${curUser.user || '____________________'}</b>)</td>
+                        </tr>
+                    </table>
+                </div>`;
+
+            }
 
             } else if (printType === 'kelas') {
                 // ==========================================
