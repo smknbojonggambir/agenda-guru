@@ -894,21 +894,18 @@
             if (!tgl || !kelas) return alert("Pilih Tanggal dan Kelas terlebih dahulu!");
 
             const studentRows = document.querySelectorAll('.student-row');
-            let batchData = [];
+            let detailAbsensi = [];
 
             studentRows.forEach(row => {
-    const nama = row.getAttribute("data-nama");
-    const selected = row.querySelector("input[type=radio]:checked");
-
-    batchData.push({
-        tipe: "Absensi",
-        tanggal: tgl,
-        kelas: kelas,
-        nama_guru: curUser.user,
-        nama_siswa: nama,
-        status_hadir: selected.value
-    });
-});
+                const nama = row.getAttribute('data-nama');
+                const selectedRadio = row.querySelector('input[type="radio"]:checked');
+                if (selectedRadio) {
+                    detailAbsensi.push({
+                        nama: nama,
+                        status: selectedRadio.value
+                    });
+                }
+            });
 
             const payload = {
                 tipe: 'absensi',
@@ -920,7 +917,7 @@
 
             document.getElementById('loading').style.display = 'flex';
             try {
-                const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create_batch', data: payload }) });
+                const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'create', data: payload }) });
                 if (res.ok) {
                     alert("Data Presensi Berhasil Disimpan!");
                     document.getElementById('abs-kelas').value = '';
